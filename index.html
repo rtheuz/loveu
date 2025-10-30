@@ -1,158 +1,233 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoveU - B💕M</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="utf-8" />
+<title>💖 Surpresa Épica 💖</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Montserrat:wght@400;600&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Montserrat',sans-serif;
+    color:#fff;
+    background:url('https://i.imgur.com/0JMLcYr.jpeg') center/cover no-repeat fixed;
+    transition:background 0.8s ease,color 0.6s ease;
+    overflow:auto;
+    min-height:100vh;
+  }
+  body,button,a{cursor:none!important}
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
+  /* animações e layout básicos */
+  body.loaded h1,body.loaded .container{opacity:1;transform:none}
+  h1{font-family:'Pacifico',cursive;font-size:clamp(2rem,6vw,3rem);color:#ffb6c1;text-shadow:0 0 12px rgba(255,105,180,.9);
+      margin:28px 0 12px;opacity:0;transform:scale(.9);transition:all .8s cubic-bezier(.2,.9,.3,1);text-align:center}
+  .wrap{display:flex;align-items:flex-start;justify-content:center;padding:20px;gap:20px}
+  .container{background:rgba(255,255,255,.12);backdrop-filter:blur(6px);padding:22px;border-radius:18px;
+      box-shadow:0 6px 30px rgba(0,0,0,.45);max-width:760px;width:100%;opacity:0;transform:scale(.98);transition:all .6s}
+  .top{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+  .photo{width:240px;min-width:160px;border-radius:12px;overflow:hidden;border:3px solid rgba(233,30,99,.9);flex-shrink:0}
+  .photo img{display:block;width:100%;height:auto}
+  .maincol{flex:1;min-width:220px}
+  .message{font-weight:600;font-size:1.05rem;margin-bottom:10px;white-space:pre-wrap;text-shadow:0 0 8px rgba(0,0,0,.7)}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .btn{padding:10px 18px;border-radius:24px;border:none;background:linear-gradient(135deg,#ff80ab,#ff4f8b);
+      color:#fff;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.2s}
+  .btn:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(255,80,130,.12)}
+  .btn:active{transform:translateY(-1px) scale(.995)}
 
-        .container {
-            text-align: center;
-            color: white;
-            padding: 2rem;
-            animation: fadeIn 1.5s ease-in;
-        }
+  /* Spotify sempre visível */
+  .spotify-box{
+    margin-top:12px;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 0 18px rgba(0,0,0,.35);
+  }
+  iframe.spotify-frame{
+    width:100%;
+    height:152px;
+    border:none;
+    border-radius:12px;
+  }
 
-        h1 {
-            font-size: 6rem;
-            margin-bottom: 2rem;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
-            animation: pulse 2s ease-in-out infinite;
-        }
+  #extraContent{margin-top:18px;display:block;height:0;overflow:hidden;transition:height .45s,opacity .35s;opacity:0}
+  #extraContent.open{height:auto;opacity:1;padding-top:12px}
+  .extra-inner{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+  .extra-inner img{width:100%;max-width:360px;border-radius:12px;border:2px solid rgba(255,128,171,.9);
+      cursor:pointer;object-fit:cover;max-height:60vh}
+  .extra-text{flex:1;font-size:1rem;color:#ffeef6}
 
-        .heart {
-            font-size: 8rem;
-            margin: 2rem 0;
-            animation: heartbeat 1.5s ease-in-out infinite;
-            display: inline-block;
-        }
+  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+      background:rgba(0,0,0,.8);z-index:1000;padding:20px}
+  .modal.open{display:flex}
+  .modal img{max-width:100%;max-height:90vh;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
 
-        .message {
-            font-size: 2.5rem;
-            font-weight: bold;
-            letter-spacing: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            margin-top: 2rem;
-        }
+  .heart{position:fixed;bottom:-20px;width:var(--size);height:var(--size);background:var(--color);
+      transform:rotate(-45deg);opacity:0;animation:floatHeart var(--duration) linear var(--delay) forwards;z-index:1}
+  .heart::before,.heart::after{content:"";position:absolute;width:var(--size);height:var(--size);background:var(--color);border-radius:50%}
+  .heart::before{top:calc(var(--size)*-0.5);left:0}.heart::after{left:calc(var(--size)*0.5);top:0}
+  @keyframes floatHeart{0%{opacity:0}10%{opacity:var(--opacity)}100%{transform:translate(var(--windX),-110vh) rotate(-45deg);opacity:0}}
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+  /* Cursor personalizado */
+  .cursor{
+    position:fixed;
+    left:50%;
+    top:50%;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    pointer-events:none;
+    transform:translate(-50%,-50%);
+    z-index:9999;
+    mix-blend-mode:screen;
+    transition:width .12s ease,height .12s ease,opacity .18s ease;
+    will-change:left,top,width,height,opacity;
+    background:radial-gradient(circle at 30% 30%,#fff8,transparent 25%),
+               linear-gradient(135deg,#ffb6c1,#ff4f8b);
+    box-shadow:0 6px 18px rgba(255,80,140,.25);
+  }
+  .cursor.big{width:52px;height:52px}
 
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-        }
+  .cursor .c-heart{width:12px;height:12px;transform:rotate(-45deg);background:#fff;border-radius:2px;position:relative}
+  .cursor .c-heart::before,.cursor .c-heart::after{content:"";position:absolute;width:12px;height:12px;background:#fff;border-radius:50%}
+  .cursor .c-heart::before{top:-6px;left:0}.cursor .c-heart::after{left:6px;top:0}
 
-        @keyframes heartbeat {
-            0%, 100% {
-                transform: scale(1);
-            }
-            10%, 30% {
-                transform: scale(1.2);
-            }
-            20%, 40% {
-                transform: scale(1.1);
-            }
-        }
+  body.dark{color:#ffd3e4}
+  body.dark h1{color:#ffc1d6}
+  body.dark .btn{background:linear-gradient(135deg,#aa3b6a,#ff6f9b)}
+  body.dark .container{background:rgba(20,20,20,.65)}
+  @media(max-width:600px){.top{flex-direction:column;align-items:center}.photo{width:180px}.container{padding:16px}}
 
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .particle {
-            position: absolute;
-            font-size: 2rem;
-            opacity: 0.6;
-            animation: float 10s infinite;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.6;
-            }
-            90% {
-                opacity: 0.6;
-            }
-            100% {
-                transform: translateY(-100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-    </style>
+  /* painel de controle */
+  #controlPanel{
+    position:fixed;top:10px;left:10px;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);
+    padding:10px 14px;border-radius:10px;font-size:.85rem;z-index:1200;color:#fff;
+  }
+  #controlPanel label{display:block;margin-bottom:6px;font-weight:600}
+  #controlPanel input{width:260px;padding:4px 6px;border-radius:6px;border:none;margin-bottom:8px}
+</style>
 </head>
 <body>
-    <div class="particles" id="particles"></div>
-    
-    <div class="container">
-        <h1>LoveU</h1>
-        <div class="heart">💕</div>
-        <div class="message">B💕M</div>
-    </div>
+  <div id="controlPanel">
+    <label>🌞 Fundo Diurno:</label>
+    <input id="dayBgInput" placeholder="URL da imagem diurna" />
+    <label>🌙 Fundo Noturno:</label>
+    <input id="nightBgInput" placeholder="URL da imagem noturna" />
+  </div>
 
-    <script>
-        // Create floating particles
-        const particlesContainer = document.getElementById('particles');
-        const hearts = ['💕', '❤️', '💖', '💗', '💓', '💝'];
-        
-        function createParticle() {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.textContent = hearts[Math.floor(Math.random() * hearts.length)];
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDuration = (Math.random() * 5 + 5) + 's';
-            particle.style.animationDelay = Math.random() * 5 + 's';
-            particlesContainer.appendChild(particle);
-            
-            // Remove particle after animation
-            setTimeout(() => {
-                particle.remove();
-            }, 15000);
-        }
-        
-        // Create initial particles
-        for (let i = 0; i < 20; i++) {
-            setTimeout(createParticle, i * 500);
-        }
-        
-        // Keep creating new particles
-        setInterval(createParticle, 1000);
-    </script>
+  <h1>💖 TE AMOOO 💖</h1>
+  <div class="wrap">
+    <div class="container">
+      <div class="top">
+        <figure class="photo"><img src="https://i.imgur.com/oK3x5BH.jpeg" alt="foto"></figure>
+        <div class="maincol">
+          <div class="message" id="message"></div>
+          <div class="controls">
+            <button class="btn" id="playBtn">▶️ Tocar Playlist</button>
+            <button class="btn" id="moreBtn">💌 Ver Mais</button>
+            <button class="btn" id="darkModeBtn">🌙 Modo Noturno</button>
+          </div>
+          <div class="spotify-box">
+            <iframe class="spotify-frame"
+              src="https://open.spotify.com/embed/playlist/3AlzaL3fuUAtulQFklJy8v?utm_source=generator"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
+            </iframe>
+          </div>
+        </div>
+      </div>
+      <div id="extraContent">
+        <div class="extra-inner">
+          <div class="extra-text">Algumas lembranças nossas... 💕</div>  
+          <img id="extraImg" src="https://i.imgur.com/kUJiuhm.jpeg" alt="lembrança">
+          <img id="extraImg" src="https://i.imgur.com/PPq9KND.jpeg" alt="lembrança">
+          <div class="extra-text">Você é a razão do meu sorriso todos os dias 😍</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="modal" class="modal"><img id="modalImg" src="" alt=""></div>
+  <div id="cursor" class="cursor"><div class="c-heart"></div></div>
+
+<script>
+  /* sons */
+  const clickSound = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_4b08a875f3.mp3?filename=click-124467.mp3");
+  const openSound  = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_643244bab6.mp3?filename=magic-124470.mp3");
+  const heartSound = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_97ab3022ac.mp3?filename=sparkle-124472.mp3");
+  clickSound.volume=openSound.volume=heartSound.volume=0.3;
+
+  const messageEl=document.getElementById('message');
+  const text="AMOOR DA MINHA VIDA, MINHA GATINHAA 💫";
+  let i=0;function type(){if(i<text.length){messageEl.textContent+=text.charAt(i++);setTimeout(type,70)}}
+  window.onload=()=>{setTimeout(()=>document.body.classList.add('loaded'),180);type()}
+
+  // --- Cursor com alinhamento exato ---
+  const cursor=document.getElementById('cursor');
+  let targetX=window.innerWidth/2,targetY=window.innerHeight/2,currentX=targetX,currentY=targetY,ticking=false;
+  document.addEventListener('mousemove',e=>{
+    targetX=e.clientX;targetY=e.clientY;
+    if(!ticking){ticking=true;requestAnimationFrame(updateCursorPosition);}
+  });
+  function updateCursorPosition(){
+    const lerp=0.22;
+    currentX+=(targetX-currentX)*lerp;
+    currentY+=(targetY-currentY)*lerp;
+    cursor.style.left=currentX+'px';
+    cursor.style.top=currentY+'px';
+    if(Math.abs(targetX-currentX)>0.5||Math.abs(targetY-currentY)>0.5){requestAnimationFrame(updateCursorPosition);}
+    else{cursor.style.left=targetX+'px';cursor.style.top=targetY+'px';ticking=false;}
+  }
+  document.querySelectorAll('button,a,img').forEach(el=>{
+    el.addEventListener('mouseenter',()=>cursor.classList.add('big'));
+    el.addEventListener('mouseleave',()=>cursor.classList.remove('big'));
+  });
+
+  function createHeart(){
+    const h=document.createElement('div');h.className='heart';
+    const s=Math.random()*22+10,d=Math.random()*6+6,del=Math.random()*1.2,hue=Math.random()*360;
+    const scale=Math.random()*0.9+0.6,op=Math.random()*0.45+0.35,wind=(Math.random()-0.5)*140+'px';
+    h.style=`--size:${s}px;--color:hsl(${hue},80%,70%);--scale:${scale};--opacity:${op};--duration:${d}s;--delay:${del}s;--windX:${wind};left:${Math.random()*innerWidth}px`;
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),(d+del)*1000+200);
+    heartSound.currentTime=0;heartSound.play();
+  }
+  setInterval(createHeart,800);
+
+  const moreBtn=document.getElementById('moreBtn'),extra=document.getElementById('extraContent');
+  let open=false;
+  moreBtn.onclick=()=>{
+    open=!open;clickSound.play();
+    if(open){extra.classList.add('open');moreBtn.textContent='💘 Ver Menos';openSound.play();}
+    else{extra.classList.remove('open');moreBtn.textContent='💌 Ver Mais';}
+  };
+
+  const modal=document.getElementById('modal'),modalImg=document.getElementById('modalImg');
+  extraImg.onclick=()=>{
+    modalImg.src=extraImg.src;modal.classList.add('open');
+    document.body.style.overflow='hidden';openSound.play();
+  };
+  modal.onclick=()=>{
+    modal.classList.remove('open');modalImg.src='';document.body.style.overflow='';
+  };
+
+  const playBtn=document.getElementById('playBtn');
+  playBtn.onclick=()=>{clickSound.play();playBtn.textContent='💓 Playlist tocando!';};
+
+  let dark=false;const darkBtn=document.getElementById('darkModeBtn');
+  let DAY_BG='https://i.imgur.com/0JMLcYr.jpeg',NIGHT_BG='https://i.imgur.com/rJePXtj.jpeg';
+  darkBtn.onclick=()=>{
+    dark=!dark;clickSound.play();
+    document.body.classList.toggle('dark',dark);
+    darkBtn.textContent=dark?'☀️ Modo Claro':'🌙 Modo Noturno';
+    if(dark&&NIGHT_BG)document.body.style.backgroundImage=`url('${NIGHT_BG}')`;
+    else document.body.style.backgroundImage=`url('${DAY_BG}')`;
+  };
+
+  /* painel controle inputs */
+  const dayInput=document.getElementById('dayBgInput');
+  const nightInput=document.getElementById('nightBgInput');
+  dayInput.value=DAY_BG;nightInput.value=NIGHT_BG;
+  dayInput.onchange=()=>{DAY_BG=dayInput.value;if(!dark)document.body.style.backgroundImage=`url('${DAY_BG}')`;}
+  nightInput.onchange=()=>{NIGHT_BG=nightInput.value;if(dark)document.body.style.backgroundImage=`url('${NIGHT_BG}')`;}
+</script>
 </body>
 </html>
