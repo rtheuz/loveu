@@ -3,6 +3,6 @@ B💕M
 
 ## 💝💖💗💓
 
-Visita: [https://rtheuz.github.io/loveu/]([https://rtheuz.github.io/loveu/)
+Visita: https://rtheuz.github.io/loveu/
 
 
