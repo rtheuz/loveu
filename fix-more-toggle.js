@@ -53,7 +53,8 @@
 
     if (isOpen) {
       // Close: animate from current height to 0
-      const currentHeight = extraContent.scrollHeight;
+      // Get the actual rendered height before starting animation
+      const currentHeight = extraContent.getBoundingClientRect().height;
       extraContent.style.height = currentHeight + 'px';
       
       // Force reflow to ensure the transition works
@@ -91,11 +92,13 @@
       isOpen = true;
       
       // After transition completes, set height to auto for responsive behavior
-      const handleTransitionEnd = function() {
-        if (isOpen) {
+      // Wait for both height and opacity transitions to complete
+      const handleTransitionEnd = function(e) {
+        // Only handle height transition to avoid duplicate calls
+        if (e.propertyName === 'height' && isOpen) {
           extraContent.style.height = 'auto';
+          extraContent.removeEventListener('transitionend', handleTransitionEnd);
         }
-        extraContent.removeEventListener('transitionend', handleTransitionEnd);
       };
       extraContent.addEventListener('transitionend', handleTransitionEnd);
     }
