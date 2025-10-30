@@ -125,12 +125,12 @@
   .small{font-size:.9rem;padding:6px 10px;border-radius:10px;background:rgba(0,0,0,.12);color:#fff}
 
   /* cursor and hearts */
-  .heart{position:fixed;bottom:-20px;width:var(--size);height:var(--size);background:var(--color);transform:rotate(-45deg);opacity:0;animation:floatHeart var(--duration) linear var(--delay) forwards;z[...]
+  .heart{position:fixed;bottom:-20px;width:var(--size);height:var(--size);background:var(--color);transform:rotate(-45deg);opacity:0;animation:floatHeart var(--duration) linear var(--delay) forwards;z-index:1}
   .heart::before,.heart::after{content:"";position:absolute;width:var(--size);height:var(--size);background:var(--color);border-radius:50%}
   .heart::before{top:calc(var(--size)*-0.5);left:0}.heart::after{left:calc(var(--size)*0.5);top:0}
   @keyframes floatHeart{0%{opacity:0}10%{opacity:var(--opacity)}100%{transform:translate(var(--windX),-110vh) rotate(-45deg);opacity:0}}
 
-  .cursor{position:fixed;left:50%;top:50%;width:28px;height:28px;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);z-index:9999;mix-blend-mode:screen;transition:width .12s ease,heig[...]
+  .cursor{position:fixed;left:50%;top:50%;width:28px;height:28px;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);z-index:9999;mix-blend-mode:screen;transition:width .12s ease,height .12s ease,opacity .18s ease;background:radial-gradient(circle at 30% 30%,#fff8,transparent 25%),linear-gradient(135deg,#ffb6c1,#ff4f8b);box-shadow:0 6px 18px rgba(255,80,140,.25)}
   .cursor.big{width:52px;height:52px}
   .cursor .c-heart{width:12px;height:12px;transform:rotate(-45deg);background:#fff;border-radius:2px;position:relative}
   .cursor .c-heart::before,.cursor .c-heart::after{content:"";position:absolute;width:12px;height:12px;background:#fff;border-radius:50%}
@@ -153,7 +153,7 @@
   </div>
   <div id="bgOverlay"></div>
 
-  <div id="controlPanel" aria-label="Painel de controle" style="position:fixed;top:10px;left:10px;background:rgba(0,0,0,.42);backdrop-filter:blur(6px);padding:10px 14px;border-radius:10px;font-size:.8[...]
+  <div id="controlPanel" aria-label="Painel de controle" style="position:fixed;top:10px;left:10px;background:rgba(0,0,0,.42);backdrop-filter:blur(6px);padding:10px 14px;border-radius:10px;font-size:.85rem;z-index:1200;color:#fff;max-width:340px;">
     <label style="font-weight:700;margin-bottom:6px;display:block">🌞 Fundo Diurno (imagem, mp4 ou YouTube)</label>
     <input id="dayBgInput" placeholder="URL da imagem, .mp4 ou link YouTube (watch/shorts/youtu.be/playlist)" style="width:100%;padding:6px;border-radius:6px;border:none;margin-bottom:8px" />
     <label style="font-weight:700;margin-bottom:6px;display:block">🌙 Fundo Noturno (imagem, mp4 ou YouTube)</label>
@@ -284,60 +284,22 @@ window.addEventListener('load',()=>{
 
   // populate improved gallery
   populateGallery();
-
-  // ensure youtube iframe sizing recalculates on resize
+  // small tweak: ensure youtube iframe sizing recalculates on resize
   window.addEventListener('resize', adjustYouTubeSizing);
-
-  // Attach the "Ver Mais" button handler so it expands/collapses the gallery
-  const moreBtn = document.getElementById('moreBtn');
-  const extraContent = document.getElementById('extraContent');
-  moreBtn.addEventListener('click', () => {
-    const isOpen = extraContent.classList.contains('open');
-    try{ clickSound.currentTime = 0; clickSound.play().catch(()=>{}); }catch(e){}
-    if(isOpen){
-      // collapse: animate to height 0
-      const startHeight = extraContent.scrollHeight;
-      extraContent.style.height = startHeight + 'px';
-      // force reflow to pick up starting height
-      void extraContent.offsetHeight;
-      extraContent.style.transition = 'height .36s, opacity .3s';
-      extraContent.style.height = '0px';
-      extraContent.classList.remove('open');
-      extraContent.setAttribute('aria-hidden', 'true');
-      moreBtn.setAttribute('aria-expanded', 'false');
-      moreBtn.textContent = '💌 Ver Mais';
-      // after transition, remove inline height to allow future auto-sizing
-      setTimeout(()=>{ extraContent.style.height=''; extraContent.style.transition=''; }, 360);
-    } else {
-      // expand: set height to scrollHeight so transition can animate
-      extraContent.classList.add('open');
-      extraContent.setAttribute('aria-hidden', 'false');
-      moreBtn.setAttribute('aria-expanded', 'true');
-      moreBtn.textContent = '🔽 Ver Menos';
-      const targetHeight = extraContent.scrollHeight;
-      extraContent.style.height = '0px';
-      // force reflow
-      void extraContent.offsetHeight;
-      extraContent.style.transition = 'height .36s, opacity .3s';
-      extraContent.style.height = targetHeight + 'px';
-      // after transition, clear inline height so content can grow naturally
-      setTimeout(()=>{ extraContent.style.height=''; extraContent.style.transition=''; }, 380);
-    }
-  });
 });
 
 /* Cursor smoothing */
 const cursor=document.getElementById('cursor');
 let targetX=innerWidth/2,targetY=innerHeight/2,currentX=targetX,currentY=targetY,ticking=false;
 document.addEventListener('mousemove',e=>{ targetX=e.clientX; targetY=e.clientY; if(!ticking){ticking=true;requestAnimationFrame(updateCursor);} });
-function updateCursor(){ const lerp=0.22; currentX+=(targetX-currentX)*lerp; currentY+=(targetY-currentY)*lerp; cursor.style.left=currentX+'px'; cursor.style.top=currentY+'px'; if(Math.abs(targetX-currentX)<0.5 && Math.abs(targetY-currentY)<0.5){ ticking=false; } else { requestAnimationFrame(updateCursor); } }
+function updateCursor(){ const lerp=0.22; currentX+=(targetX-currentX)*lerp; currentY+=(targetY-currentY)*lerp; cursor.style.left=currentX+'px'; cursor.style.top=currentY+'px'; if(Math.abs(targetX-currentX)>0.5||Math.abs(targetY-currentY)>0.5) requestAnimationFrame(updateCursor); else { cursor.style.left=targetX+'px'; cursor.style.top=targetY+'px'; ticking=false;} }
 document.querySelectorAll('button,a,img').forEach(el=>{ el.addEventListener('mouseenter',()=>cursor.classList.add('big')); el.addEventListener('mouseleave',()=>cursor.classList.remove('big')); });
 
 /* Hearts/Confetti */
 const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let heartsActive = 0, MAX_HEARTS = 20;
-function createHeart(){ if(prefersReduced) return; if(heartsActive>=MAX_HEARTS) return; heartsActive++; const h=document.createElement('div'); h.className='heart'; const s=Math.random()*22+10,d=Math.random()*2+2; h.style.setProperty('--size', s+'px'); h.style.setProperty('--duration', d+'s'); h.style.setProperty('--delay', '0s'); h.style.setProperty('--opacity', (0.6+Math.random()*0.4).toString()); h.style.setProperty('--color', '#ff6fa3'); h.style.setProperty('--windX', (Math.random()*160-80)+'px'); document.body.appendChild(h); h.addEventListener('animationend', ()=>{ h.remove(); heartsActive--; }); }
-function createConfettiBurst(){ if(prefersReduced) return; const burst = Math.floor(8 + Math.random()*14); for(let i=0;i<burst;i++){ const c=document.createElement('div'); c.className='confetti'; c.style.position='fixed'; c.style.width='8px'; c.style.height='12px'; c.style.left=(Math.random()*100)+'vw'; c.style.bottom='0px'; c.style.background=['#ff6f9b','#ffd166','#61dafb','#7afc9c'][Math.floor(Math.random()*4)]; c.style.transform='rotate('+ (Math.random()*360)+'deg)'; c.style.opacity='0.95'; const dur=2+Math.random()*2; c.style.transition='transform '+dur+'s linear, bottom '+dur+'s linear, opacity '+dur+'s linear'; document.body.appendChild(c); setTimeout(()=>{ c.style.bottom = (90+Math.random()*40)+'vh'; c.style.transform = 'rotate('+(Math.random()*720)+'deg) translateX('+(Math.random()*200-100)+'px)'; c.style.opacity='0'; },20); setTimeout(()=>c.remove(), (dur+0.3)*1000); }}
+function createHeart(){ if(prefersReduced) return; if(heartsActive>=MAX_HEARTS) return; heartsActive++; const h=document.createElement('div'); h.className='heart'; const s=Math.random()*22+10,d=Math.random()*6+6,del=Math.random()*1.2,hue=Math.random()*360,op=Math.random()*0.45+0.35,wind=(Math.random()-0.5)*140+'px'; h.style=`--size:${s}px;--color:hsl(${hue},80%,70%);--opacity:${op};--duration:${d}s;--delay:${del}s;--windX:${wind};left:${Math.random()*innerWidth}px`; document.body.appendChild(h); h.addEventListener('animationend',()=>{h.remove();heartsActive--;}); try{heartSound.currentTime=0;heartSound.play().catch(()=>{});}catch(e){} }
+function createConfettiBurst(){ if(prefersReduced) return; const burst = Math.floor(8 + Math.random()*14); for(let i=0;i<burst;i++){ const c=document.createElement('div'); c.className='confetti'; const bg=`hsl(${Math.floor(Math.random()*360)},80%,60%)`; c.style.background=bg; c.style.left = (Math.random()*100)+'vw'; c.style.top = (-5 - Math.random()*10)+'vh'; c.style.width=(6+Math.random()*8)+'px'; c.style.height=(8+Math.random()*10)+'px'; c.style.animationDuration=(3+Math.random()*3)+'s'; c.style.transform=`rotate(${Math.random()*360}deg)`; document.body.appendChild(c); setTimeout(()=>c.remove(),7000);} }
 
 /* Decorations control */
 let decInterval = null;
@@ -394,15 +356,12 @@ function injectSpotifyIframe(raw, focus=true){
   const url = normalizeSpotifyUrl(raw);
   spotifyBox.innerHTML='';
   if(!url){ spotifyBox.innerHTML = '<div id="spotifyPlaceholder" style="padding:18px;text-align:center;color:#ffeeff">URL inválida. Cole um link de playlist do Spotify.</div>'; return; }
-  const ifr = document.createElement('iframe'); ifr.className='spotify-frame'; ifr.title='Playlist do Spotify'; ifr.loading='lazy'; ifr.allow='autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture'; ifr.src = url;
-  spotifyBox.appendChild(ifr);
-  if(focus){ try{ ifr.focus && ifr.focus(); }catch(e){} }
-  localStorage.setItem('SPOTIFY_URL', raw);
+  const ifr = document.createElement('iframe'); ifr.className='spotify-frame'; ifr.title='Playlist do Spotify'; ifr.loading='lazy'; ifr.allow='autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture'; ifr.src=url; spotifyBox.appendChild(ifr); localStorage.setItem('SPOTIFY_URL', raw); if(focus) ifr.focus && ifr.focus();
 }
 loadPlaylistBtn.addEventListener('click', ()=>{ const raw=spotifyInput.value.trim(); injectSpotifyIframe(raw,true); });
 
 const playBtn=document.getElementById('playBtn');
-playBtn.onclick=()=>{ try{clickSound.currentTime=0;clickSound.play().catch(()=>{});}catch(e){} const iframe = spotifyBox.querySelector('iframe'); if(iframe){ iframe.focus && iframe.focus(); playBtn.textContent='⏸️ Pausar (use o player)'; } else { injectSpotifyIframe(spotifyInput.value.trim(), true); } }
+playBtn.onclick=()=>{ try{clickSound.currentTime=0;clickSound.play().catch(()=>{});}catch(e){} const iframe = spotifyBox.querySelector('iframe'); if(iframe){ iframe.focus && iframe.focus(); playBtn.textContent='💓 Abra o player e pressione play'; setTimeout(()=>playBtn.textContent='▶️ Tocar Playlist',4000);} else { playBtn.textContent='❗ Carregue uma playlist primeiro'; setTimeout(()=>playBtn.textContent='▶️ Tocar Playlist',3000); } };
 
 /* Dark mode & background handling */
 const darkBtn=document.getElementById('darkModeBtn');
@@ -484,11 +443,11 @@ function onFirstInteraction(){ userInteracted=true; try{openSound.currentTime=0;
 document.addEventListener('pointerdown', onFirstInteraction, {once:true});
 
 /* reset */
-document.getElementById('resetBtn').addEventListener('click', ()=>{ localStorage.removeItem('DAY_BG'); localStorage.removeItem('NIGHT_BG'); localStorage.removeItem('SPOTIFY_URL'); localStorage.removeI[...]
+document.getElementById('resetBtn').addEventListener('click', ()=>{ localStorage.removeItem('DAY_BG'); localStorage.removeItem('NIGHT_BG'); localStorage.removeItem('SPOTIFY_URL'); localStorage.removeItem('decoration'); localStorage.removeItem('darkMode'); dayInput.value=''; nightInput.value=''; spotifyInput.value=''; DAY_BG='https://i.imgur.com/0JMLcYr.jpeg'; NIGHT_BG='https://i.imgur.com/rJePXtj.jpeg'; document.body.classList.remove('dark'); dark=false; darkBtn.textContent='🌙 Modo Noturno'; applyDecoration('hearts'); document.getElementById('decorationSelect').value='hearts'; setBackground(DAY_BG); localStorage.setItem('SPOTIFY_URL', DEFAULT_SPOTIFY_URL); document.getElementById('spotifyInput').value=DEFAULT_SPOTIFY_URL; injectSpotifyIframe(DEFAULT_SPOTIFY_URL,false); });
 
 /* accessibility helpers */
 modal.setAttribute('tabindex','-1');
-document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ if(bgVideo && !bgVideo.paused) bgVideo.pause(); } else { if(bgVideo && bgVideo.src && !bgVideo.paused && !userInteracted) bgVid[...]
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ if(bgVideo && !bgVideo.paused) bgVideo.pause(); } else { if(bgVideo && bgVideo.src && !bgVideo.paused && !userInteracted) bgVideo.play().catch(()=>{}); } });
 window.addEventListener('resize', adjustYouTubeSizing);
 
 /* -------------------------------
