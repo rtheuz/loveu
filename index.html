@@ -4,6 +4,8 @@
 <meta charset="utf-8" />
 <title>💖 Surpresa Épica 💖</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="Uma surpresa romântica com músicas, lembranças e mensagens." />
+<meta name="theme-color" content="#ff80ab" />
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Montserrat:wght@400;600&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
@@ -16,7 +18,6 @@
     overflow:auto;
     min-height:100vh;
   }
-  body,button,a{cursor:none!important}
 
   /* animações e layout básicos */
   body.loaded h1,body.loaded .container{opacity:1;transform:none}
@@ -35,6 +36,7 @@
       color:#fff;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.2s}
   .btn:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(255,80,130,.12)}
   .btn:active{transform:translateY(-1px) scale(.995)}
+  .btn:focus{outline:3px solid rgba(255,200,220,.6);outline-offset:3px}
 
   /* Spotify sempre visível */
   .spotify-box{
@@ -105,6 +107,11 @@
   }
   #controlPanel label{display:block;margin-bottom:6px;font-weight:600}
   #controlPanel input{width:260px;padding:4px 6px;border-radius:6px;border:none;margin-bottom:8px}
+
+  /* reduced motion preference */
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+  }
 </style>
 </head>
 <body>
@@ -119,16 +126,16 @@
   <div class="wrap">
     <div class="container">
       <div class="top">
-        <figure class="photo"><img src="https://i.imgur.com/oK3x5BH.jpeg" alt="foto"></figure>
+        <figure class="photo"><img loading="lazy" src="https://i.imgur.com/oK3x5BH.jpeg" alt="Nossa foto juntos" /></figure>
         <div class="maincol">
           <div class="message" id="message"></div>
           <div class="controls">
-            <button class="btn" id="playBtn">▶️ Tocar Playlist</button>
-            <button class="btn" id="moreBtn">💌 Ver Mais</button>
-            <button class="btn" id="darkModeBtn">🌙 Modo Noturno</button>
+            <button type="button" class="btn" id="playBtn">▶️ Tocar Playlist</button>
+            <button type="button" class="btn" id="moreBtn" aria-expanded="false">💌 Ver Mais</button>
+            <button type="button" class="btn" id="darkModeBtn">🌙 Modo Noturno</button>
           </div>
           <div class="spotify-box">
-            <iframe class="spotify-frame"
+            <iframe class="spotify-frame" title="Playlist do Spotify" loading="lazy"
               src="https://open.spotify.com/embed/playlist/3AlzaL3fuUAtulQFklJy8v?utm_source=generator"
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
             </iframe>
@@ -137,16 +144,16 @@
       </div>
       <div id="extraContent">
         <div class="extra-inner">
-          <div class="extra-text">Algumas lembranças nossas... 💕</div>  
-          <img id="extraImg" src="https://i.imgur.com/kUJiuhm.jpeg" alt="lembrança">
-          <img id="extraImg" src="https://i.imgur.com/PPq9KND.jpeg" alt="lembrança">
+          <div class="extra-text">Algumas lembranças nossas... 💕</div>
+          <img class="extra-img" loading="lazy" src="https://i.imgur.com/kUJiuhm.jpeg" alt="Lembrança 1: passeio" />
+          <img class="extra-img" loading="lazy" src="https://i.imgur.com/PPq9KND.jpeg" alt="Lembrança 2: abraço" />
           <div class="extra-text">Você é a razão do meu sorriso todos os dias 😍</div>
         </div>
       </div>
     </div>
   </div>
-  <div id="modal" class="modal"><img id="modalImg" src="" alt=""></div>
-  <div id="cursor" class="cursor"><div class="c-heart"></div></div>
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true"><img id="modalImg" src="" alt="Imagem ampliada"></div>
+  <div id="cursor" class="cursor" aria-hidden="true"><div class="c-heart"></div></div>
 
 <script>
   /* sons */
@@ -158,14 +165,18 @@
   const messageEl=document.getElementById('message');
   const text="AMOOR DA MINHA VIDA, MINHA GATINHAA 💫";
   let i=0;function type(){if(i<text.length){messageEl.textContent+=text.charAt(i++);setTimeout(type,70)}}
-  window.onload=()=>{setTimeout(()=>document.body.classList.add('loaded'),180);type()}
+  window.addEventListener('load',()=>{setTimeout(()=>document.body.classList.add('loaded'),180);type();
+    // restore dark mode preference
+    const saved = localStorage.getItem('darkMode');
+    if(saved === '1'){document.body.classList.add('dark');document.getElementById('darkModeBtn').textContent='☀️ Modo Claro'}
+  });
 
   // --- Cursor com alinhamento exato ---
   const cursor=document.getElementById('cursor');
   let targetX=window.innerWidth/2,targetY=window.innerHeight/2,currentX=targetX,currentY=targetY,ticking=false;
   document.addEventListener('mousemove',e=>{
     targetX=e.clientX;targetY=e.clientY;
-    if(!ticking){ticking=true;requestAnimationFrame(updateCursorPosition);}
+    if(!ticking){ticking=true;requestAnimationFrame(updateCursorPosition);}  
   });
   function updateCursorPosition(){
     const lerp=0.22;
@@ -173,7 +184,7 @@
     currentY+=(targetY-currentY)*lerp;
     cursor.style.left=currentX+'px';
     cursor.style.top=currentY+'px';
-    if(Math.abs(targetX-currentX)>0.5||Math.abs(targetY-currentY)>0.5){requestAnimationFrame(updateCursorPosition);}
+    if(Math.abs(targetX-currentX)>0.5||Math.abs(targetY-currentY)>0.5){requestAnimationFrame(updateCursorPosition);} 
     else{cursor.style.left=targetX+'px';cursor.style.top=targetY+'px';ticking=false;}
   }
   document.querySelectorAll('button,a,img').forEach(el=>{
@@ -181,43 +192,70 @@
     el.addEventListener('mouseleave',()=>cursor.classList.remove('big'));
   });
 
+  // Hearts: limit active hearts and respect reduced-motion
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let heartsActive = 0, MAX_HEARTS = 15;
   function createHeart(){
+    if(prefersReduced) return;
+    if(heartsActive >= MAX_HEARTS) return;
+    heartsActive++;
     const h=document.createElement('div');h.className='heart';
     const s=Math.random()*22+10,d=Math.random()*6+6,del=Math.random()*1.2,hue=Math.random()*360;
     const scale=Math.random()*0.9+0.6,op=Math.random()*0.45+0.35,wind=(Math.random()-0.5)*140+'px';
     h.style=`--size:${s}px;--color:hsl(${hue},80%,70%);--scale:${scale};--opacity:${op};--duration:${d}s;--delay:${del}s;--windX:${wind};left:${Math.random()*innerWidth}px`;
     document.body.appendChild(h);
-    setTimeout(()=>h.remove(),(d+del)*1000+200);
-    heartSound.currentTime=0;heartSound.play();
+    h.addEventListener('animationend',()=>{h.remove();heartsActive--;});
+    // play sound on creation only when user has interacted (some browsers block play otherwise)
+    try{heartSound.currentTime=0;heartSound.play().catch(()=>{});}catch(e){}
   }
-  setInterval(createHeart,800);
+  // only run if user interacts with page to avoid autoplay policies
+  let userInteracted=false;
+  function onFirstInteraction(){userInteracted=true;document.removeEventListener('pointerdown',onFirstInteraction);}
+  document.addEventListener('pointerdown',onFirstInteraction,{once:true});
+  setInterval(()=>{ if(userInteracted) createHeart(); },800);
 
   const moreBtn=document.getElementById('moreBtn'),extra=document.getElementById('extraContent');
   let open=false;
   moreBtn.onclick=()=>{
-    open=!open;clickSound.play();
-    if(open){extra.classList.add('open');moreBtn.textContent='💘 Ver Menos';openSound.play();}
-    else{extra.classList.remove('open');moreBtn.textContent='💌 Ver Mais';}
+    open=!open;try{clickSound.currentTime=0;clickSound.play().catch(()=>{});}catch(e){}
+    if(open){extra.classList.add('open');moreBtn.textContent='💘 Ver Menos';moreBtn.setAttribute('aria-expanded','true');try{openSound.play().catch(()=>{});}catch(e){}
+    }else{extra.classList.remove('open');moreBtn.textContent='💌 Ver Mais';moreBtn.setAttribute('aria-expanded','false');}
   };
 
   const modal=document.getElementById('modal'),modalImg=document.getElementById('modalImg');
-  extraImg.onclick=()=>{
-    modalImg.src=extraImg.src;modal.classList.add('open');
-    document.body.style.overflow='hidden';openSound.play();
-  };
-  modal.onclick=()=>{
-    modal.classList.remove('open');modalImg.src='';document.body.style.overflow='';
-  };
+  // wire up all extra images
+  const extraImgs = document.querySelectorAll('.extra-img');
+  extraImgs.forEach(img => {
+    img.addEventListener('click', ()=> openModal(img.src, img.alt));
+    img.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(img.src, img.alt); } });
+    img.setAttribute('tabindex','0');
+  });
+
+  function openModal(src, alt){
+    modalImg.src = src; modalImg.alt = alt || 'Imagem ampliada'; modal.classList.add('open');
+    modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+    try{if(userInteracted){openSound.currentTime=0;openSound.play().catch(()=>{});} }catch(e){}
+    // focus management: move focus to modal for keyboard users
+    modal.focus && modal.focus();
+  }
+  function closeModal(){ modal.classList.remove('open'); modalImg.src=''; modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+
+  modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+  document.addEventListener('keydown',(e)=>{ if(e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
 
   const playBtn=document.getElementById('playBtn');
-  playBtn.onclick=()=>{clickSound.play();playBtn.textContent='💓 Playlist tocando!';};
+  playBtn.onclick=()=>{try{clickSound.currentTime=0;clickSound.play().catch(()=>{});}catch(e){}
+    playBtn.textContent='💓 Playlist tocando!';};
 
   let dark=false;const darkBtn=document.getElementById('darkModeBtn');
   let DAY_BG='https://i.imgur.com/0JMLcYr.jpeg',NIGHT_BG='https://i.imgur.com/rJePXtj.jpeg';
+  // restore from localStorage
+  if(localStorage.getItem('darkMode') === '1'){dark=true;document.body.classList.add('dark');}
   darkBtn.onclick=()=>{
-    dark=!dark;clickSound.play();
+    dark=!dark;try{clickSound.currentTime=0;clickSound.play().catch(()=>{});}catch(e){}
     document.body.classList.toggle('dark',dark);
     darkBtn.textContent=dark?'☀️ Modo Claro':'🌙 Modo Noturno';
+    localStorage.setItem('darkMode', dark ? '1' : '0');
     if(dark&&NIGHT_BG)document.body.style.backgroundImage=`url('${NIGHT_BG}')`;
     else document.body.style.backgroundImage=`url('${DAY_BG}')`;
   };
@@ -226,8 +264,9 @@
   const dayInput=document.getElementById('dayBgInput');
   const nightInput=document.getElementById('nightBgInput');
   dayInput.value=DAY_BG;nightInput.value=NIGHT_BG;
-  dayInput.onchange=()=>{DAY_BG=dayInput.value;if(!dark)document.body.style.backgroundImage=`url('${DAY_BG}')`;}
-  nightInput.onchange=()=>{NIGHT_BG=nightInput.value;if(dark)document.body.style.backgroundImage=`url('${NIGHT_BG}')`;}
+  function safeUrl(s){ try{ const u = new URL(s, location.href); return u.href; }catch(e){return '';} }
+  dayInput.onchange=()=>{ const v = safeUrl(dayInput.value); if(v){DAY_BG=v; if(!dark)document.body.style.backgroundImage=`url('${DAY_BG}')`} };
+  nightInput.onchange=()=>{ const v = safeUrl(nightInput.value); if(v){NIGHT_BG=v; if(dark)document.body.style.backgroundImage=`url('${NIGHT_BG}')`} };
 </script>
 </body>
 </html>
