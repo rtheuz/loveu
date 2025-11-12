@@ -77,8 +77,8 @@
     .tab.active{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:#fff}
 
     /* moodboard */
-    #moodBoard{min-height:220px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.06));padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}
-    .sticker{width:96px;height:96px;border-radius:8px;overflow:hidden;position:relative;touch-action:none;cursor:grab}
+    #moodBoard{min-height:220px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.06));padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;position:relative;overflow:hidden}
+    .sticker{width:96px;height:96px;border-radius:8px;overflow:hidden;position:relative;touch-action:none;cursor:grab;flex:0 0 auto}
     .sticker img{width:100%;height:100%;object-fit:cover;display:block}
 
     #boardCanvas{flex:1;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(0,0,0,0.05));min-height:300px;position:relative;overflow:hidden}
@@ -93,9 +93,7 @@
     #achievements{display:flex;gap:8px;flex-wrap:wrap}
     .badge{background:linear-gradient(90deg,#ffdce9,#ffe7f5);color:#6b0234;padding:6px 10px;border-radius:999px;font-weight:700;box-shadow:0 6px 14px rgba(0,0,0,.1)}
 
-    /* control panel collapsed state
-       When collapsed we keep a visible handle area so the user can always click to re-open.
-    */
+    /* control panel collapsed state */
     #controlPanel{
       transition:transform .28s ease,opacity .28s ease;
       position:fixed;
@@ -110,10 +108,9 @@
       max-width:85vw;
       box-shadow:0 12px 30px rgba(0,0,0,.45);
     }
-    /* keep ~44px visible when collapsed so toggle is reachable */
     #controlPanel.collapsed{transform:translateX(calc(-100% + 44px));opacity:0.95}
 
-    /* floating handle (if user prefers) */
+    /* floating handle (always available) */
     #panelToggleHandle{
       position:fixed;
       top:12px;
@@ -142,6 +139,7 @@
       display: block;
       left: 0;
       top: 0;
+      border-radius: 4px;
     }
     .heart::before,
     .heart::after {
@@ -198,13 +196,11 @@
   </div>
   <div id="bgOverlay"></div>
 
-  <!-- Control panel kept as an accessible fixed element; the toggle is external so it's always clickable -->
+  <!-- Control panel -->
   <div id="controlPanel" aria-label="Painel de controle">
-    <!-- internal header (no duplicate toggle) -->
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
       <div style="font-weight:700;font-size:.95rem">Painel de controle</div>
     </div>
-
     <label style="display:block;font-weight:700;margin-bottom:6px">🌞 Fundo Diurno</label>
     <input id="dayBgInput" placeholder="URL da imagem, .mp4 ou link YouTube" style="width:260px;padding:6px;border-radius:6px;border:none;margin-bottom:8px" />
     <label style="display:block;font-weight:700;margin-bottom:6px">🌙 Fundo Noturno</label>
@@ -231,7 +227,7 @@
         <div class="maincol">
           <div class="message" id="message" aria-live="polite"></div>
 
-          <!-- Global controls moved OUT of the playlist panel (so they make sense everywhere) -->
+          <!-- Global controls (moved out of playlist) -->
           <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:6px">
             <button id="moreBtn" class="btn" aria-expanded="false">💌 Ver Mais</button>
             <button id="darkModeBtn" class="btn">🌙 Modo Noturno</button>
@@ -247,7 +243,6 @@
 
           <div id="panel-playlist" class="panel">
             <div class="controls">
-              <!-- Keep only the play button inside playlist as requested -->
               <button id="playBtn" class="btn">▶️ Tocar Playlist</button>
             </div>
 
@@ -278,9 +273,10 @@
             <div id="quizPanel">
               <div class="quiz-q" id="quizQuestion">Carregando quiz...</div>
               <div class="quiz-options" id="quizOptions"></div>
-              <div style="margin-top:8px;display:flex;gap:8px">
+              <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
                 <button id="nextQ" class="btn" style="display:none">Próxima</button>
                 <div id="quizScore" class="small">Pontuação: 0</div>
+                <div id="quizResult" class="small" style="margin-left:10px;display:none"></div>
               </div>
             </div>
           </div>
@@ -305,7 +301,7 @@
           <div id="panel-more" class="panel" hidden>
             <div style="display:flex;flex-direction:column;gap:8px">
               <div style="font-weight:700">Conquistas</div>
-              <div id="achievements"><span class="badge">Primeiro Play</span></div>
+              <div id="achievements"><!-- persisted badges will be injected --></div>
               <div style="margin-top:8px">
                 <button id="shareBtn" class="btn">📤 Compartilhar</button>
               </div>
@@ -328,11 +324,11 @@
   <div id="cursor" class="cursor" aria-hidden="true"><div class="trail"></div><div class="core"></div></div>
 
   <script>
-    /* Notes:
-       - Added CSS & animations for .heart and .confetti so decoration effects work.
-       - Kept toggle handle outside the panel (always clickable). Collapsed panel leaves a 44px handle visible.
-       - Moved global controls (Ver Mais, Dark Mode) out of the Playlist panel (they remain present).
-       - JS is guarded against missing elements and uses CSS variables (--size, --duration, --windX, --color, --opacity) set by the creator functions.
+    /* Fixes implemented:
+       - stickers: click-to-add + drag/drop support, board is position:relative so absolute stickers work; dropped/added nodes are made draggable
+       - achievements: persisted in localStorage (ACHIEVEMENTS), rendered on load and saved on addAchievement
+       - quiz: shows final result when last question answered, displays final message and awards achievement
+       - panel toggle handle ensures panel reachable when collapsed
     */
 
     const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -345,7 +341,42 @@
     /* Defaults */
     const DEFAULT_SPOTIFY_URL = 'https://open.spotify.com/playlist/3AlzaL3fuUAtulQFklJy8v?si=_5BzUq0CQ_WDlL31eLaUcg';
 
-    /* YouTube helpers (unchanged) */
+    /* --- Achievements persistence --- */
+    function loadAchievements() {
+      try {
+        const raw = localStorage.getItem('ACHIEVEMENTS');
+        const arr = raw ? JSON.parse(raw) : [];
+        const holder = document.getElementById('achievements');
+        if (!holder) return;
+        holder.innerHTML = '';
+        arr.forEach(name => {
+          const s = document.createElement('span'); s.className = 'badge'; s.textContent = name;
+          holder.appendChild(s);
+        });
+      } catch (e) { console.error('loadAchievements', e); }
+    }
+    function persistAchievements(list) {
+      try { localStorage.setItem('ACHIEVEMENTS', JSON.stringify(list)); } catch(e) {}
+    }
+    function addAchievement(name) {
+      try {
+        const holder = document.getElementById('achievements');
+        if (!holder) return;
+        // avoid duplicates in UI and storage
+        const exists = Array.from(holder.children).some(b => b.textContent === name);
+        if (exists) return;
+        const span = document.createElement('span'); span.className = 'badge'; span.textContent = name;
+        holder.appendChild(span);
+        // persist
+        let cur = [];
+        try { cur = JSON.parse(localStorage.getItem('ACHIEVEMENTS') || '[]'); } catch(e){ cur = []; }
+        if (!cur.includes(name)) { cur.push(name); persistAchievements(cur); }
+        // transient highlight
+        setTimeout(()=> span.classList.add('fade'), 3500);
+      } catch (e) { console.error('addAchievement error', e); }
+    }
+
+    /* YouTube helpers */
     function parseYouTubeUrl(url) {
       if (!url) return null;
       try {
@@ -377,21 +408,25 @@
     window.addEventListener('load', () => {
       setTimeout(() => document.body.classList.add('loaded'), 180);
 
+      // decoration select
       const savedDec = (function(){try{return localStorage.getItem('decoration')||'hearts'}catch(e){return 'hearts'}})();
       const decSelect = document.getElementById('decorationSelect');
       if (decSelect) decSelect.value = savedDec;
       applyDecoration(savedDec);
 
+      // spotify
       const sp = (function(){try{return localStorage.getItem('SPOTIFY_URL')}catch(e){return null}})();
       if (sp) { const sIn = document.getElementById('spotifyInput'); if (sIn) sIn.value = sp; injectSpotifyIframe(sp, false); }
       else { const sIn = document.getElementById('spotifyInput'); if (sIn) sIn.value = DEFAULT_SPOTIFY_URL; try{localStorage.setItem('SPOTIFY_URL', DEFAULT_SPOTIFY_URL)}catch(e){}; injectSpotifyIframe(DEFAULT_SPOTIFY_URL, false); }
 
+      // backgrounds
       const day = (function(){try{return localStorage.getItem('DAY_BG')}catch(e){return null}})();
       const night = (function(){try{return localStorage.getItem('NIGHT_BG')}catch(e){return null}})();
       if (day) { const di = document.getElementById('dayBgInput'); if (di) di.value = day; }
       if (night) { const ni = document.getElementById('nightBgInput'); if (ni) ni.value = night; }
 
       populateGallery();
+
       try { if (localStorage.getItem && localStorage.getItem('CONTROL_PANEL_COLLAPSED') === '1') document.getElementById('controlPanel').classList.add('collapsed'); } catch(e){}
 
       addCursorHoverListeners();
@@ -400,9 +435,11 @@
       initQuiz();
       populateStickers();
       initTicTacToe();
+
+      loadAchievements(); // render persisted achievements
     });
 
-    /* Cursor (unchanged) */
+    /* Cursor */
     const cursor = document.getElementById('cursor');
     let targetX = window.innerWidth / 2, targetY = window.innerHeight / 2;
     let currentX = targetX, currentY = targetY, cursorTicking = false;
@@ -451,7 +488,6 @@
             c.style.background = `hsl(${Math.floor(Math.random()*360)} 90% 65%)`; c.style.position = 'fixed'; c.style.zIndex = 10000;
             c.style.setProperty('--cx', (Math.random()*120-60) + 'px');
             document.body.appendChild(c);
-            // animate via CSS keyframes; remove after animation
             setTimeout(()=> c.remove(), 1600);
           } else {
             const h = document.createElement('div'); h.className = 'heart';
@@ -464,7 +500,6 @@
             h.style.left = (x + (Math.random()*40 - 20)) + 'px'; h.style.top = (y + (Math.random()*24 - 12)) + 'px';
             h.style.position = 'fixed'; h.style.zIndex = 10000;
             document.body.appendChild(h);
-            // ensure cleanup in case animationend doesn't fire
             setTimeout(()=> h.remove(), 2000);
           }
         } catch (ex) { console.error('safeClickBurst error', ex); }
@@ -479,13 +514,11 @@
       const size = Math.floor(Math.random()*18)+12; const left = Math.random()*100; const duration = (Math.random()*4)+5;
       const opacity = 0.6 + Math.random()*0.35; const wind = (Math.random()*160 - 80) + 'px'; const hue = 320 + Math.floor(Math.random()*40);
       h.style.setProperty('--size', size + 'px'); h.style.setProperty('--duration', duration + 's'); h.style.setProperty('--opacity', opacity);
-      h.style.setProperty('--windX', wind); h.style.setProperty('--color', `hsl(${hue} 85% 65%)`); h.style.left = left + 'vw'; h.style.setProperty('--delay', (Math.random()*0.45)+'s'); h.style.bottom = '-20px';
-      // position bottom via CSS; set top to auto so animation moves upward
-      h.style.top = 'auto';
-      h.style.bottom = '-20px';
+      h.style.setProperty('--windX', wind); h.style.setProperty('--color', `hsl(${hue} 85% 65%)`); h.style.left = left + 'vw'; h.style.setProperty('--delay', (Math.random()*0.45)+'s');
+      // place at bottom
+      h.style.bottom = '-20px'; h.style.top = 'auto';
       document.body.appendChild(h);
-      // remove after expected duration + small buffer
-      setTimeout(()=> { h.remove(); }, (duration*1000) + 8000);
+      setTimeout(()=> { try{ h.remove(); }catch(e){} }, (duration*1000) + 8000);
     }
 
     function createConfettiBurst() {
@@ -615,7 +648,6 @@
       const iframe = spotifyBox && spotifyBox.querySelector('iframe');
       if (iframe) { iframe.focus && iframe.focus(); playBtn.textContent = '▶️ Tocando (se suportado)'; setTimeout(()=> playBtn.textContent = '▶️ Tocar Playlist', 1100); }
       else injectSpotifyIframe(spotifyInput && spotifyInput.value, true);
-      // award achievement
       addAchievement('Primeiro Play');
     });
 
@@ -700,7 +732,7 @@
       createRipple(ev, document.getElementById('resetBtn'));
     });
 
-    /* Mini-game: memory (unchanged logic) */
+    /* Mini-game: memory */
     const openGameBtn = document.getElementById('openGameBtn');
     const gamePanel = document.getElementById('gamePanel');
     const gameBoard = document.getElementById('gameBoard');
@@ -759,7 +791,6 @@
         createRipple(ev, openGameBtn);
       });
     }
-
     restartGame && restartGame.addEventListener('click', (ev) => { initGame(); createRipple(ev, restartGame); });
 
     /* Tabs */
@@ -775,15 +806,14 @@
         const panelId = t.getAttribute('data-panel');
         const panel = document.getElementById(panelId);
         if (panel) panel.hidden = false;
-        // When opening games panel, ensure game initialized
         if (panelId === 'panel-games') initGame();
       });
     }
 
-    /* Panel toggle - works with the floating handle and also with an optional internal toggle if present */
+    /* Panel toggle (floating handle + storage) */
     (function bindPanelToggle() {
       try {
-        const panelToggle = document.getElementById('panelToggleHandle') || document.getElementById('panelToggle');
+        const panelToggle = document.getElementById('panelToggleHandle');
         if (!panelToggle) return;
         panelToggle.addEventListener('click', () => {
           const cp = document.getElementById('controlPanel');
@@ -797,7 +827,7 @@
 
     document.getElementById('decorationSelect') && document.getElementById('decorationSelect').addEventListener('change', (e) => applyDecoration(e.target.value));
 
-    /* "Ver Mais" expand - reuses global moreBtn */
+    /* "Ver Mais" expand */
     (function bindMoreButton() {
       const moreBtn = document.getElementById('moreBtn');
       const extraContent = document.getElementById('extraContent');
@@ -831,32 +861,26 @@
     /* Modal photo click */
     document.getElementById('mainPhoto') && document.getElementById('mainPhoto').addEventListener('click', (ev) => { openModal(ev.currentTarget.src, ev.currentTarget.alt); createRipple(ev, ev.currentTarget); });
 
-    /* Achievements */
-    function addAchievement(name) {
-      const holder = document.getElementById('achievements');
-      if (!holder) return;
-      const exists = Array.from(holder.children).some(b => b.textContent === name);
-      if (exists) return;
-      const span = document.createElement('span'); span.className = 'badge'; span.textContent = name;
-      holder.appendChild(span);
-      setTimeout(()=> span.remove(), 7000);
-    }
-
-    /* Quiz (simple local quiz) */
+    /* --- Quiz: show final result and award achievement --- */
     const quizData = [
       { q: 'Onde nos conhecemos?', a: ['Na escola','No trabalho','Por amigos','Online','Basquete'], correct: 4 },
-      { q: 'Qual é meu nome?', a: ['Matheus','AMOR DA MINHA VIDA, MEU DONO, MEU HOMEM','Ice','AMOR DA MINHA VIDA'], correct: 1 },
+      { q: 'Qual é meu nome?', a: ['Matheus','Ice','AMOR DA MINHA VIDA','AMOR DA MINHA VIDA, MEU DONO, MEU HOMEM'], correct: 2 },
       { q: 'Melhor programa juntos?', a: ['Cinema','Pôr do sol','Viagem','Jantar caseiro','🤭😈🔞','TODOS'], correct: 5 },
-      { q: 'Meu carinho favorito?', a: ['Nas costas', 'Pezinhos No rosto', 'Cafuné', 'Na barriga', 'No pescoço'], correct: 1 },
-      { q: 'Qual minha forma favorita de pontuar?', a: ['Bandeja', 'Uma dunk', 'Uma sexta de 3 pontos', 'Uma jogada 1 contra 1'], correct: 3 }
+      { q: 'Meu carinho favorito?', a: ['Nas costas', 'Pezinhos No rosto', 'Cafuné', 'Na barriga', 'No pescoço'], correct: 0 },
+      { q: 'Qual minha forma favorita de pontuar?', a: ['Bandeja', 'Uma dunk', 'Uma sexta de 3 pontos', 'Uma jogada 1 contra 1'], correct: 2 }
     ];
     let quizIndex = 0, quizScore = 0;
     function initQuiz() {
+      quizIndex = 0; quizScore = 0;
       renderQuiz();
+      const scoreEl = document.getElementById('quizScore');
+      if (scoreEl) scoreEl.textContent = `Pontuação: ${quizScore}`;
+      const resultEl = document.getElementById('quizResult');
+      if (resultEl) resultEl.style.display = 'none';
     }
     function renderQuiz() {
       const qEl = document.getElementById('quizQuestion'); const opts = document.getElementById('quizOptions');
-      const nextBtn = document.getElementById('nextQ'); const scoreEl = document.getElementById('quizScore');
+      const nextBtn = document.getElementById('nextQ'); const scoreEl = document.getElementById('quizScore'); const resultEl = document.getElementById('quizResult');
       if (!qEl || !opts) return;
       const item = quizData[quizIndex];
       if (!item) return;
@@ -864,11 +888,29 @@
       item.a.forEach((opt, i) => {
         const d = document.createElement('div'); d.className = 'option'; d.tabIndex = 0; d.textContent = opt;
         d.addEventListener('click', () => {
-          if (i === item.correct) { quizScore++; d.style.background = 'linear-gradient(90deg,#bff2d6,#c7ffe8)'; addAchievement('Quiz acertou'); }
-          else { d.style.background = 'linear-gradient(90deg,#ffd6d6,#ffe6e6)'; }
+          // prevent double click
+          if (d.dataset.answered) return;
+          d.dataset.answered = '1';
+          if (i === item.correct) {
+            quizScore++;
+            d.style.background = 'linear-gradient(90deg,#bff2d6,#c7ffe8)';
+            addAchievement('Quiz acertou');
+          } else {
+            d.style.background = 'linear-gradient(90deg,#ffd6d6,#ffe6e6)';
+          }
           Array.from(opts.children).forEach(c => c.style.pointerEvents = 'none');
-          if (nextBtn) nextBtn.style.display = quizIndex < quizData.length - 1 ? 'inline-flex' : 'none';
           if (scoreEl) scoreEl.textContent = `Pontuação: ${quizScore}`;
+          // if last question, show final result and award achievement
+          if (quizIndex >= quizData.length - 1) {
+            if (resultEl) {
+              resultEl.style.display = 'inline-block';
+              resultEl.textContent = `Quiz finalizado! Pontuação: ${quizScore} / ${quizData.length}`;
+            }
+            addAchievement('Quiz concluído');
+            if (nextBtn) nextBtn.style.display = 'none';
+          } else {
+            if (nextBtn) nextBtn.style.display = 'inline-flex';
+          }
         });
         d.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); d.click(); } });
         opts.appendChild(d);
@@ -880,10 +922,147 @@
       };
     }
 
-    /* Mood board and other features unchanged (drag/drop etc) */
+    /* --- Mood board: populate stickers, support click-to-add and drag/drop --- */
+    function populateStickers() {
+      const container = document.getElementById('moodStickers');
+      if (!container) return;
+      container.innerHTML = '';
+      const urls = [
+        'https://i.imgur.com/oK3x5BH.jpeg',
+        'https://i.imgur.com/kUJiuhm.jpeg',
+        'https://i.imgur.com/PPq9KND.jpeg',
+        'https://i.imgur.com/OawRcMt.jpeg',
+        'https://i.imgur.com/n4b9m73.jpeg'
+      ];
+      urls.forEach(u => {
+        const s = document.createElement('div'); s.className = 'sticker';
+        s.innerHTML = `<img src="${u}" loading="lazy" draggable="false"/>`;
+        // click to clone onto board (better UX for touch)
+        s.addEventListener('click', () => {
+          addStickerToBoard(u, 40, 40);
+        });
+        // allow dragstart so desktop users can drag to board
+        s.draggable = true;
+        s.addEventListener('dragstart', (ev) => {
+          try { ev.dataTransfer.setData('text/plain', u); } catch(e){}
+        });
+        container.appendChild(s);
+      });
 
-    /* safety */
+      const upload = document.getElementById('uploadImage');
+      upload && upload.addEventListener('change', (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        const url = URL.createObjectURL(f);
+        const s = document.createElement('div'); s.className = 'sticker';
+        s.innerHTML = `<img src="${url}" loading="lazy" draggable="false"/>`;
+        s.addEventListener('click', () => { addStickerToBoard(url, 40, 40); });
+        s.draggable = true;
+        s.addEventListener('dragstart', (ev) => { try { ev.dataTransfer.setData('text/plain', url); } catch(e){} });
+        container.appendChild(s);
+      });
+
+      const board = document.getElementById('moodBoard');
+      if (!board) return;
+      board.addEventListener('dragover', (ev) => ev.preventDefault());
+      board.addEventListener('drop', (ev) => {
+        ev.preventDefault();
+        const url = ev.dataTransfer.getData('text/plain');
+        if (!url) return;
+        const rect = board.getBoundingClientRect();
+        const x = ev.clientX - rect.left - 48;
+        const y = ev.clientY - rect.top - 48;
+        addStickerToBoard(url, x, y);
+      });
+    }
+
+    // add sticker to board at given relative x,y
+    function addStickerToBoard(url, x, y) {
+      const board = document.getElementById('moodBoard');
+      if (!board) return;
+      const node = document.createElement('div'); node.className = 'sticker';
+      node.style.position = 'absolute';
+      // clamp positions
+      const br = board.getBoundingClientRect();
+      const w = 96, h = 96;
+      let nx = Math.max(0, Math.min(br.width - w, x));
+      let ny = Math.max(0, Math.min(br.height - h, y));
+      node.style.left = nx + 'px';
+      node.style.top = ny + 'px';
+      node.innerHTML = `<img src="${url}" loading="lazy" draggable="false"/>`;
+      makeDraggable(node);
+      board.appendChild(node);
+    }
+
+    function makeDraggable(node) {
+      let offsetX=0, offsetY=0, dragging=false;
+      node.addEventListener('pointerdown', (e) => {
+        dragging = true; node.setPointerCapture(e.pointerId);
+        offsetX = e.clientX - node.getBoundingClientRect().left; offsetY = e.clientY - node.getBoundingClientRect().top;
+        node.style.cursor = 'grabbing';
+      });
+      node.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const board = document.getElementById('moodBoard').getBoundingClientRect();
+        let x = e.clientX - board.left - offsetX; let y = e.clientY - board.top - offsetY;
+        x = Math.max(0, Math.min(board.width - node.offsetWidth, x)); y = Math.max(0, Math.min(board.height - node.offsetHeight, y));
+        node.style.left = x + 'px'; node.style.top = y + 'px';
+      });
+      node.addEventListener('pointerup', (e) => { dragging=false; try{ node.releasePointerCapture(e.pointerId); }catch(e){} node.style.cursor='grab'; });
+      // also allow double-tap to remove
+      node.addEventListener('dblclick', () => node.remove());
+    }
+
+    /* Tic-Tac-Toe (simple 2 player) */
+    function initTicTacToe() {
+      const startBtn = document.getElementById('startTicTac');
+      const ttt = document.getElementById('ticTacToe');
+      const board = document.getElementById('tttBoard');
+      const resetBtn = document.getElementById('resetTtt');
+      let cells = [], turn = 'X';
+      startBtn && startBtn.addEventListener('click', () => {
+        ttt.style.display = ttt.style.display === 'none' ? 'block' : 'none';
+        if (ttt.style.display === 'block') {
+          board.innerHTML = '';
+          cells = [];
+          for (let i=0;i<9;i++){
+            const c = document.createElement('div'); c.style.width='70px'; c.style.height='70px'; c.style.display='flex';
+            c.style.alignItems='center'; c.style.justifyContent='center'; c.style.background='rgba(255,255,255,0.02)';
+            c.style.fontSize='28px'; c.style.borderRadius='8px'; c.style.cursor='pointer';
+            c.addEventListener('click', () => {
+              if (c.textContent) return;
+              c.textContent = turn; turn = turn === 'X' ? 'O' : 'X';
+              checkTtt();
+            });
+            board.appendChild(c); cells.push(c);
+          }
+        }
+      });
+      resetBtn && resetBtn.addEventListener('click', () => { board.innerHTML=''; ttt.style.display='none'; });
+      function checkTtt() {
+        const combos = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        for (const combo of combos) {
+          const [a,b,c] = combo;
+          if (cells[a].textContent && cells[a].textContent === cells[b].textContent && cells[a].textContent === cells[c].textContent) {
+            cells[a].style.background = cells[b].style.background = cells[c].style.background = 'linear-gradient(90deg,#ffd6d6,#fff0f0)';
+            addAchievement('Vencedor do Jogo da Velha');
+            return;
+          }
+        }
+      }
+    }
+
+    /* Share stub */
+    document.getElementById('shareBtn') && document.getElementById('shareBtn').addEventListener('click', () => {
+      try {
+        if (navigator.share) { navigator.share({ title: 'Surpresa', text: 'Olha o que preparei pra você!', url: location.href }); addAchievement('Compartilhou'); }
+        else { prompt('Copie o link para compartilhar:', location.href); }
+      } catch (e) {}
+    });
+
+    /* safety: ensure decoration is applied on load */
     try { const saved = (function(){try{return localStorage.getItem('decoration')}catch(e){return null}})(); if (saved) applyDecoration(saved); } catch(e) {}
+
   </script>
 </body>
 
