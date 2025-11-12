@@ -2,12 +2,21 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
 
 // Configure CORS
 app.use(cors());
+
+// Serve Socket.IO client library
+app.get('/socket.io/socket.io.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'node_modules/socket.io/client-dist/socket.io.min.js'));
+});
+
+// Serve static files from parent directory (for testing)
+app.use(express.static(path.join(__dirname, '..')));
 
 // Initialize Socket.IO with CORS support
 const io = new Server(server, {

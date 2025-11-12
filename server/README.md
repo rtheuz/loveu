@@ -95,7 +95,9 @@ PORT=4000 npm start
    ```javascript
    const socket = io('http://192.168.1.100:3000');
    ```
-3. Outros dispositivos na mesma rede podem acessar usando este IP
+3. Outros dispositivos na mesma rede podem acessar o site em `http://192.168.1.100:3000`
+
+**Nota:** O servidor agora serve tanto o Socket.IO quanto os arquivos estáticos. Você pode acessar o site diretamente em `http://localhost:3000` sem precisar de um servidor HTTP separado.
 
 ## Eventos suportados
 
