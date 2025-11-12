@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const server = http.createServer(app);
@@ -10,13 +11,20 @@ const server = http.createServer(app);
 // Configure CORS
 app.use(cors());
 
-// Serve Socket.IO client library
-app.get('/socket.io/socket.io.js', (req, res) => {
+// Rate limiter for file serving
+const fileRateLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+
+// Serve Socket.IO client library with rate limiting
+app.get('/socket.io/socket.io.js', fileRateLimiter, (req, res) => {
   res.sendFile(path.join(__dirname, 'node_modules/socket.io/client-dist/socket.io.min.js'));
 });
 
-// Serve static files from parent directory (for testing)
-app.use(express.static(path.join(__dirname, '..')));
+// Serve static files from parent directory (for testing) with rate limiting
+app.use(fileRateLimiter, express.static(path.join(__dirname, '..')));
 
 // Initialize Socket.IO with CORS support
 const io = new Server(server, {
