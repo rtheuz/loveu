@@ -698,14 +698,12 @@
               <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
                 <input id="albumFiles" type="file" accept="image/*" multiple />
                 <button id="albumUploadBtn" class="btn">📤 Enviar</button>
-                <button id="albumExportBtn" class="btn small">📦 Exportar (.json)</button>
+                <button id="albumExportBtn" class="btn small">📦 Exportar</button>
                 <input id="albumImportFile" type="file" accept=".json" style="display:none" />
-                <button id="albumImportBtn" class="btn small">📥 Importar (.json)</button>
+                <button id="albumImportBtn" class="btn small">📥 Importar</button>
               </div>
               <div id="albumGrid"
                 style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px"></div>
-              <div style="margin-top:8px;font-size:.9rem;color:#ffdfe8">As imagens ficam armazenadas no navegador
-                (IndexedDB). Use Exportar/Importar para compartilhar.</div>
             </div>
           </div>
 
@@ -738,7 +736,7 @@
   </div>
 
   <script>
-    
+
     const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     /* Typing message */
@@ -1499,6 +1497,10 @@
     try { const saved = (function () { try { return localStorage.getItem('decoration') } catch (e) { return null } })(); if (saved) applyDecoration(saved); } catch (e) { }
 
   </script>
-  <script src="public/album.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-cloudinary-sync.js"></script>
 </body>
+
 </html>
