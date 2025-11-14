@@ -1590,10 +1590,6 @@
       function saveTimeline() {
         try {
           localStorage.setItem('TIMELINE_EVENTS', JSON.stringify(timeline));
-          // Sincronizar com Firebase
-          if (typeof window.syncToFirebase === 'function') {
-            window.syncToFirebase('timeline', timeline);
-          }
         } catch (e) {
           console.error('Failed to save timeline', e);
         }
@@ -1670,10 +1666,6 @@
       function saveMessages() {
         try {
           localStorage.setItem('LOVE_MESSAGES', JSON.stringify(messages));
-          // Sincronizar com Firebase
-          if (typeof window.syncToFirebase === 'function') {
-            window.syncToFirebase('messages', messages);
-          }
         } catch (e) {
           console.error('Failed to save messages', e);
         }
@@ -1712,11 +1704,6 @@
           const defaultDate = '2023-09-23';
           startDate = new Date(defaultDate);
           localStorage.setItem('RELATIONSHIP_START', defaultDate);
-          
-          // Sincronizar com Firebase
-          if (typeof window.syncToFirebase === 'function') {
-            window.syncToFirebase('relationshipStart', defaultDate);
-          }
         }
       } catch (e) {
         startDate = new Date('2023-09-23');
@@ -2516,167 +2503,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="firebase-cloudinary-sync.js"></script>
-  
-  <script>
-    /* ===== FIREBASE SYNC FOR MESSAGES, TIMELINE & COUNTER ===== */
-    (function initFirebaseSync() {
-      if (typeof firebase === 'undefined') {
-        console.warn('Firebase SDK não carregado. Dados permanecerão apenas no localStorage.');
-        return;
-      }
-
-      // Configuração Firebase (mesma do album)
-      const firebaseConfig = {
-        apiKey: "AIzaSyAsqb4bJaptuCqI5eroasO5f6i2BTm_TiY",
-        authDomain: "loveu-6f63c.firebaseapp.com",
-        projectId: "loveu-6f63c",
-        storageBucket: "loveu-6f63c.firebasestorage.app",
-        messagingSenderId: "615722418998",
-        appId: "1:615722418998:web:04ae159bdf9bf8acdf6997"
-      };
-
-      // Inicializar Firebase se ainda não foi
-      try {
-        if (!firebase.apps.length) {
-          firebase.initializeApp(firebaseConfig);
-        }
-      } catch (e) {
-        console.error('Erro ao inicializar Firebase:', e);
-        return;
-      }
-
-      const auth = firebase.auth();
-      const db = firebase.firestore();
-      let currentUser = null;
-
-      // Login anônimo
-      auth.onAuthStateChanged(user => {
-        if (!user) {
-          auth.signInAnonymously().catch(err => console.error('Erro auth:', err));
-        } else {
-          currentUser = user;
-          console.log('Firebase sync: autenticado como', user.uid);
-          setupRealtimeSync();
-        }
-      });
-
-      function setupRealtimeSync() {
-        if (!currentUser) return;
-
-        // ===== SYNC MENSAGENS =====
-        const messagesRef = db.collection('loveMessages').doc('shared');
-        
-        // Carregar mensagens do Firestore
-        messagesRef.get().then(doc => {
-          if (doc.exists && doc.data().messages) {
-            const cloudMessages = doc.data().messages;
-            localStorage.setItem('LOVE_MESSAGES', JSON.stringify(cloudMessages));
-            
-            // Re-renderizar mensagens se o painel estiver visível
-            if (typeof initMessages === 'function') {
-              initMessages();
-            }
-          }
-        }).catch(err => console.error('Erro ao carregar mensagens:', err));
-
-        // Escutar mudanças em tempo real
-        messagesRef.onSnapshot(doc => {
-          if (doc.exists && doc.data().messages) {
-            const cloudMessages = doc.data().messages;
-            localStorage.setItem('LOVE_MESSAGES', JSON.stringify(cloudMessages));
-            
-            // Re-renderizar mensagens
-            if (typeof initMessages === 'function') {
-              initMessages();
-            }
-          }
-        });
-
-        // ===== SYNC TIMELINE =====
-        const timelineRef = db.collection('timeline').doc('shared');
-        
-        // Carregar timeline do Firestore
-        timelineRef.get().then(doc => {
-          if (doc.exists && doc.data().events) {
-            const cloudTimeline = doc.data().events;
-            localStorage.setItem('TIMELINE_EVENTS', JSON.stringify(cloudTimeline));
-            
-            // Re-renderizar timeline
-            if (typeof initTimeline === 'function') {
-              initTimeline();
-            }
-          }
-        }).catch(err => console.error('Erro ao carregar timeline:', err));
-
-        // Escutar mudanças em tempo real
-        timelineRef.onSnapshot(doc => {
-          if (doc.exists && doc.data().events) {
-            const cloudTimeline = doc.data().events;
-            localStorage.setItem('TIMELINE_EVENTS', JSON.stringify(cloudTimeline));
-            
-            // Re-renderizar timeline
-            if (typeof initTimeline === 'function') {
-              initTimeline();
-            }
-          }
-        });
-
-        // ===== SYNC DATA DO RELACIONAMENTO =====
-        const counterRef = db.collection('relationship').doc('shared');
-        
-        // Carregar data do Firestore
-        counterRef.get().then(doc => {
-          if (doc.exists && doc.data().startDate) {
-            const cloudDate = doc.data().startDate;
-            localStorage.setItem('RELATIONSHIP_START', cloudDate);
-            
-            // Re-renderizar contador
-            if (typeof initCounter === 'function') {
-              initCounter();
-            }
-          }
-        }).catch(err => console.error('Erro ao carregar data:', err));
-
-        // Escutar mudanças em tempo real
-        counterRef.onSnapshot(doc => {
-          if (doc.exists && doc.data().startDate) {
-            const cloudDate = doc.data().startDate;
-            localStorage.setItem('RELATIONSHIP_START', cloudDate);
-            
-            // Re-renderizar contador
-            if (typeof initCounter === 'function') {
-              initCounter();
-            }
-          }
-        });
-      }
-
-      // ===== HELPER: SALVAR NO FIRESTORE =====
-      window.syncToFirebase = function(type, data) {
-        if (!currentUser) {
-          console.warn('Usuário não autenticado. Dados salvos apenas localmente.');
-          return;
-        }
-
-        if (type === 'messages') {
-          db.collection('loveMessages').doc('shared').set({
-            messages: data,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          }).catch(err => console.error('Erro ao salvar mensagens:', err));
-        } else if (type === 'timeline') {
-          db.collection('timeline').doc('shared').set({
-            events: data,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          }).catch(err => console.error('Erro ao salvar timeline:', err));
-        } else if (type === 'relationshipStart') {
-          db.collection('relationship').doc('shared').set({
-            startDate: data,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          }).catch(err => console.error('Erro ao salvar data:', err));
-        }
-      };
-    })();
-  </script>
 </body>
 
 </html>
