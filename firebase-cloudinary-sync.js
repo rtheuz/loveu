@@ -1,16 +1,12 @@
-// o nome do preset é LOVEUBRUNA
-// cloud name: dx4ghtdut
-
 (function () {
   if (typeof firebase === 'undefined') {
     console.error('Firebase SDK não encontrado. Inclua os scripts do Firebase antes deste arquivo.');
     return;
   }
 
-
   // ======= CONFIGURE AQUI =======
-  const CLOUD_NAME = "dx4ghtdut";        // ex: 'minhaconta'
-  const UPLOAD_PRESET = "LOVEUBRUNA";  // ex: 'album_unsigned'
+  const CLOUD_NAME = "dx4ghtdut";
+  const UPLOAD_PRESET = "LOVEUBRUNA";
   const firebaseConfig = {
     apiKey: "AIzaSyAsqb4bJaptuCqI5eroasO5f6i2BTm_TiY",
     authDomain: "loveu-6f63c.firebaseapp.com",
@@ -35,48 +31,42 @@
     }
   });
 
-  // DOM elements do seu index.html
+  // DOM elements
   const albumFiles = document.getElementById('albumFiles');
   const albumUploadBtn = document.getElementById('albumUploadBtn');
   const albumGrid = document.getElementById('albumGrid');
 
   if (!albumFiles || !albumUploadBtn || !albumGrid) {
-    console.warn('Elementos do álbum não encontrados (albumFiles, albumUploadBtn, albumGrid). Verifique os IDs.');
+    console.warn('Elementos do álbum não encontrados.');
   }
 
-  // Faz upload para Cloudinary via unsigned e pede delete_token (return_delete_token=true)
+  // Upload sem delete_token
   async function uploadToCloudinary(file) {
     const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
     const fd = new FormData();
     fd.append('file', file);
     fd.append('upload_preset', UPLOAD_PRESET);
-    // Solicita delete_token para permitir exclusão posterior sem usar API secret
-    fd.append('return_delete_token', 'true');
 
     const resp = await fetch(url, { method: 'POST', body: fd });
     if (!resp.ok) throw new Error('Upload Cloudinary falhou: ' + resp.status + ' ' + resp.statusText);
-    const json = await resp.json();
-    return json; // inclui secure_url, public_id e possivelmente delete_token
+    return await resp.json();
   }
 
-  // Faz upload para Cloudinary, depois registra a URL (e delete_token se houver) no Firestore
+  // Upload e salvar no Firestore (sem delete_token)
   async function uploadAndSave(file) {
     try {
       const uid = (auth.currentUser && auth.currentUser.uid) || 'anon';
       const cloudResp = await uploadToCloudinary(file);
       const imageUrl = cloudResp.secure_url || cloudResp.url;
       const public_id = cloudResp.public_id || null;
-      const delete_token = cloudResp.delete_token || null;
 
       if (!imageUrl) throw new Error('Cloudinary não retornou URL');
 
-      // salva no Firestore com os metadados, inclusive delete_token se houver
       await db.collection('photos').add({
         url: imageUrl,
         name: file.name,
         uploader: uid,
         public_id: public_id,
-        delete_token: delete_token,
         ts: firebase.firestore.FieldValue.serverTimestamp()
       });
 
@@ -112,22 +102,7 @@
     });
   }
 
-  // Função que chama o endpoint delete_by_token do Cloudinary
-  async function deleteFromCloudinaryByToken(deleteToken) {
-    const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/delete_by_token`;
-    const resp = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: deleteToken })
-    });
-    if (!resp.ok) {
-      const txt = await resp.text().catch(() => '');
-      throw new Error('Falha ao deletar no Cloudinary: ' + resp.status + ' ' + resp.statusText + ' ' + txt);
-    }
-    return await resp.json();
-  }
-
-  // Renderiza um cartão da grid com botão remover
+  // Render item da galeria
   function renderItem(docId, data) {
     const wrapper = document.createElement('div');
     wrapper.style = 'position:relative;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.02);cursor:pointer';
@@ -136,52 +111,41 @@
       <button class="delete-btn" title="Remover" style="
         position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.6);color:#fff;border:none;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:0.9rem;">✖</button>
     `;
+
+    // abrir imagem no modal / nova aba
     const img = wrapper.querySelector('img');
     img.addEventListener('click', () => {
       if (typeof openModal === 'function') openModal(data.url, data.name || '');
       else window.open(data.url, '_blank');
     });
 
+    // Remover do Firestore (apenas local)
     const delBtn = wrapper.querySelector('.delete-btn');
     delBtn.addEventListener('click', async (ev) => {
       ev.stopPropagation();
-      const ok = confirm('Remover esta foto do álbum? Esta ação pode ser irreversível.');
+      const ok = confirm('Remover esta foto do álbum?');
       if (!ok) return;
+
       delBtn.disabled = true;
       delBtn.textContent = '...';
-      try {
-        // Se houver delete_token, tente apagar no Cloudinary primeiro
-        if (data.delete_token) {
-          try {
-            await deleteFromCloudinaryByToken(data.delete_token);
-            console.log('Arquivo removido do Cloudinary (por delete_token).');
-          } catch (err) {
-            console.warn('Falha ao remover no Cloudinary com delete_token:', err);
-            // continuar para remover o doc localmente mesmo se falhar na nuvem
-          }
-        } else {
-          // sem delete_token: não temos como apagar no Cloudinary a partir do cliente de maneira segura
-          console.info('Nenhum delete_token disponível. O arquivo no Cloudinary poderá permanecer (órfão).');
-        }
 
-        // remover doc do Firestore
+      try {
         await db.collection('photos').doc(docId).delete();
         console.log('Documento apagado do Firestore:', docId);
+
+        wrapper.remove();
       } catch (err) {
         console.error('Erro ao remover foto:', err);
-        alert('Erro ao remover a foto. Veja console para detalhes.');
+        alert('Erro ao remover a foto.');
         delBtn.disabled = false;
         delBtn.textContent = '✖';
-        return;
       }
-      // opcional: remover o elemento da UI imediatamente
-      wrapper.remove();
     });
 
     return wrapper;
   }
 
-  // Escuta mudanças em tempo real na coleção 'photos' e renderiza
+  // Escuta em tempo real
   db.collection('photos').orderBy('ts', 'asc').onSnapshot(snapshot => {
     if (!albumGrid) return;
     albumGrid.innerHTML = '';
