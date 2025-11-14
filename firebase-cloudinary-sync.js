@@ -128,7 +128,7 @@
       body: JSON.stringify({ token: deleteToken })
     });
     if (!resp.ok) {
-      const txt = await resp.text().catch(()=>'');
+      const txt = await resp.text().catch(() => '');
       throw new Error('Falha ao deletar no Cloudinary: ' + resp.status + ' ' + resp.statusText + ' ' + txt);
     }
     return await resp.json();
@@ -139,7 +139,7 @@
     const wrapper = document.createElement('div');
     wrapper.style = 'position:relative;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.02);cursor:pointer';
     wrapper.innerHTML = `
-      <img src="${data.url}" alt="${(data.name||'Foto')}" style="width:100%;height:120px;object-fit:cover;display:block">
+      <img src="${data.url}" alt="${(data.name || 'Foto')}" style="width:100%;height:120px;object-fit:cover;display:block">
       <button class="delete-btn" title="Remover" style="
         position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.6);color:#fff;border:none;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:0.9rem;">✖</button>
     `;
