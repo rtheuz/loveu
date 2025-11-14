@@ -17,7 +17,7 @@
 
   // ======= CONFIGURE AQUI =======
   const CLOUD_NAME = "dx4ghtdut";        // ex: 'minhaconta'
-  const UPLOAD_PRESET = "loveu_unsigned";  // ex: 'album_unsigned'
+  const UPLOAD_PRESET = "LOVEUBRUNA";  // ex: 'album_unsigned'
   const firebaseConfig = {
     apiKey: "AIzaSyAsqb4bJaptuCqI5eroasO5f6i2BTm_TiY",
     authDomain: "loveu-6f63c.firebaseapp.com",
