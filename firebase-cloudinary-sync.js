@@ -1,12 +1,5 @@
-/**
- * Versão atualizada com remoção de fotos.
- * - Salva delete_token retornado pelo Cloudinary durante o upload (se suportado)
- * - Adiciona botão "Remover" para cada item do álbum
- * - Se houver delete_token: chama delete_by_token do Cloudinary e em seguida apaga o doc do Firestore
- * - Se não houver delete_token: apenas apaga o doc do Firestore (foto ficará no Cloudinary)
- *
- * Lembrete: substitua CLOUD_NAME, UPLOAD_PRESET e firebaseConfig pelos seus valores.
- */
+// o nome do preset é LOVEUBRUNA
+// cloud name: dx4ghtdut
 
 (function () {
   if (typeof firebase === 'undefined') {
@@ -53,7 +46,7 @@
 
   // Faz upload para Cloudinary via unsigned e pede delete_token (return_delete_token=true)
   async function uploadToCloudinary(file) {
-    const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
+    const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
     const fd = new FormData();
     fd.append('file', file);
     fd.append('upload_preset', UPLOAD_PRESET);
