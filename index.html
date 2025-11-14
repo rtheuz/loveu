@@ -996,7 +996,6 @@
 
           <!-- Global controls (moved out of playlist) -->
           <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:6px">
-            <button id="moreBtn" class="btn" aria-expanded="false">💌 Ver Mais</button>
             <button id="darkModeBtn" class="btn">🌙 Modo Noturno</button>
           </div>
 
@@ -1555,8 +1554,8 @@
       try {
         const saved = localStorage.getItem('TIMELINE_EVENTS');
         timeline = saved ? JSON.parse(saved) : [
-          { date: '2024-01-01', title: 'Primeiro Encontro', desc: 'O dia em que tudo começou ❤️', icon: '💕' },
-          { date: '2024-06-15', title: 'Primeiro "Eu Te Amo"', desc: 'Momento inesquecível!', icon: '💗' },
+          { date: '2024-08-04', title: 'Primeiro Beijo', desc: 'Um momento mágico 💋', icon: '😘' },
+          { date: '2024-08-06', title: 'Primeiro Encontro', desc: 'O início de tudo ❤️', icon: '💕' },
           { date: '2024-11-14', title: 'Hoje', desc: 'Cada dia mais apaixonados', icon: '🌟' }
         ];
       } catch (e) {
@@ -2266,37 +2265,6 @@
     })();
 
     document.getElementById('decorationSelect') && document.getElementById('decorationSelect').addEventListener('change', (e) => applyDecoration(e.target.value));
-
-    /* "Ver Mais" expand */
-    (function bindMoreButton() {
-      const moreBtn = document.getElementById('moreBtn');
-      const extraContent = document.getElementById('extraContent');
-      if (!moreBtn || !extraContent) return;
-      moreBtn.addEventListener('click', () => {
-        const isOpen = extraContent.classList.contains('open');
-        if (isOpen) {
-          const startHeight = extraContent.scrollHeight;
-          extraContent.style.height = startHeight + 'px';
-          void extraContent.offsetHeight;
-          extraContent.style.transition = 'height .36s, opacity .3s';
-          extraContent.style.height = '0px';
-          extraContent.classList.remove('open');
-          extraContent.setAttribute('aria-hidden', 'true');
-          moreBtn.setAttribute('aria-expanded', 'false');
-          moreBtn.textContent = '💌 Ver Mais';
-          setTimeout(() => { extraContent.style.height = ''; extraContent.style.transition = ''; }, 360);
-        } else {
-          extraContent.classList.add('open'); extraContent.setAttribute('aria-hidden', 'false');
-          moreBtn.setAttribute('aria-expanded', 'true'); moreBtn.textContent = '🔽 Ver Menos';
-          const targetHeight = extraContent.scrollHeight;
-          extraContent.style.height = '0px';
-          void extraContent.offsetHeight;
-          extraContent.style.transition = 'height .36s, opacity .3s';
-          extraContent.style.height = targetHeight + 'px';
-          setTimeout(() => { extraContent.style.height = ''; extraContent.style.transition = ''; }, 380);
-        }
-      });
-    })();
 
     /* Modal photo click */
     document.getElementById('mainPhoto') && document.getElementById('mainPhoto').addEventListener('click', (ev) => { openModal(ev.currentTarget.src, ev.currentTarget.alt); createRipple(ev, ev.currentTarget); });
