@@ -629,8 +629,8 @@
             <div class="tab" data-panel="panel-games">Jogos</div>
             <div class="tab" data-panel="panel-quiz">Quiz do Amor</div>
             <div class="tab" data-panel="panel-mood">Mood Board</div>
-            <div class="tab" data-panel="panel-more">Mais</div>
             <div class="tab" data-panel="panel-album">Álbum</div>
+            <div class="tab" data-panel="panel-more">Mais</div>  
           </div>
 
           <div id="panel-playlist" class="panel">
@@ -676,6 +676,20 @@
             </div>
           </div>
 
+          <div id="panel-album" class="panel" hidden>
+            <div id="albumPanel" style="padding:8px;">
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+                <input id="albumFiles" type="file" accept="image/*" multiple />
+                <button id="albumUploadBtn" class="btn">📤 Enviar</button>
+                <button id="albumExportBtn" class="btn small">📦 Exportar</button>
+                <input id="albumImportFile" type="file" accept=".json" style="display:none" />
+                <button id="albumImportBtn" class="btn small">📥 Importar</button>
+              </div>
+              <div id="albumGrid"
+                style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px"></div>
+            </div>
+          </div>
+
           <div id="panel-mood" class="panel" hidden>
             <div style="display:flex;gap:10px;align-items:flex-start">
               <div style="width:120px">
@@ -693,26 +707,13 @@
             </div>
           </div>
 
-          <div id="panel-album" class="panel" hidden>
-            <div id="albumPanel" style="padding:8px;">
-              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
-                <input id="albumFiles" type="file" accept="image/*" multiple />
-                <button id="albumUploadBtn" class="btn">📤 Enviar</button>
-                <button id="albumExportBtn" class="btn small">📦 Exportar</button>
-                <input id="albumImportFile" type="file" accept=".json" style="display:none" />
-                <button id="albumImportBtn" class="btn small">📥 Importar</button>
-              </div>
-              <div id="albumGrid"
-                style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px"></div>
-            </div>
-          </div>
+
 
           <div id="panel-more" class="panel" hidden>
             <div style="display:flex;flex-direction:column;gap:8px">
               <div style="font-weight:700">Conquistas</div>
               <div id="achievements"><!-- persisted badges will be injected --></div>
               <div style="margin-top:8px">
-                <button id="shareBtn" class="btn">📤 Compartilhar</button>
               </div>
             </div>
           </div>
@@ -830,8 +831,6 @@
       const night = (function () { try { return localStorage.getItem('NIGHT_BG') } catch (e) { return null } })();
       if (day) { const di = document.getElementById('dayBgInput'); if (di) di.value = day; }
       if (night) { const ni = document.getElementById('nightBgInput'); if (ni) ni.value = night; }
-
-      populateGallery();
 
       try { if (localStorage.getItem && localStorage.getItem('CONTROL_PANEL_COLLAPSED') === '1') document.getElementById('controlPanel').classList.add('collapsed'); } catch (e) { }
 
@@ -977,34 +976,6 @@
       try { createRipple(ev, el); } catch (e) { }
       const dec = (function () { try { return localStorage.getItem('decoration') || 'hearts' } catch (e) { return 'hearts' } })();
       safeClickBurst(ev.clientX, ev.clientY, dec === 'confetti' ? 'confetti' : 'hearts');
-    }
-
-    /* Modal gallery */
-    const modal = document.getElementById('modal'), modalImg = document.getElementById('modalImg');
-    function openModal(src, alt) { if (!modal || !modalImg) return; modalImg.src = src; modalImg.alt = alt || 'Imagem'; modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
-    function closeModal() { if (!modal || !modalImg) return; modal.classList.remove('open'); modalImg.src = ''; modal.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
-    modal && modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeModal(); });
-
-    /* Gallery */
-    const galleryItems = [
-      { src: 'https://i.imgur.com/kUJiuhm.jpeg' },
-      { src: 'https://i.imgur.com/PPq9KND.jpeg' },
-      { src: 'https://i.imgur.com/OawRcMt.jpeg' },
-      { src: 'https://i.imgur.com/n4b9m73.jpeg' }
-    ];
-    function populateGallery() {
-      const grid = document.getElementById('extraGrid');
-      if (!grid) return;
-      grid.innerHTML = '';
-      galleryItems.forEach(it => {
-        const card = document.createElement('div'); card.className = 'card';
-        card.innerHTML = `<img src="${it.src}" alt="${it.alt}" loading="lazy"><div class="meta">${it.alt}</div>`;
-        card.addEventListener('click', (ev) => { openModal(it.src, it.alt); createRipple(ev, card); });
-        grid.appendChild(card);
-      });
-      addCursorHoverListeners();
-      bindInteractiveEffects();
     }
 
     /* Spotify */
@@ -1277,7 +1248,8 @@
 
       // 👇 nessas duas últimas, todas as respostas estão corretas:
       { q: 'Quem faz mais carinho?', a: ['Matheus', 'Ice', 'Você meu amor', 'Claro que não é eu'], correct: [0, 1, 2, 3] },
-      { q: 'Quem Dorme mais?', a: ['Bruna', 'Bruninha', 'EU MEU AMOR DUUR', 'Claro que é eu'], correct: [0, 1, 2, 3] }
+      { q: 'Quem Dorme mais?', a: ['Bruna', 'Bruninha', 'EU MEU AMOR DUUR', 'Claro que é eu'], correct: [0, 1, 2, 3] },
+      { q: 'Qual meu sabor de sorvete favorito entre esses?', a: ['Chocolate', 'Baunilha', 'Morango', 'Pistache'], correct: 0 },
     ];
 
     let quizIndex = 0, quizScore = 0;
@@ -1484,14 +1456,6 @@
         }
       }
     }
-
-    /* Share stub */
-    document.getElementById('shareBtn') && document.getElementById('shareBtn').addEventListener('click', () => {
-      try {
-        if (navigator.share) { navigator.share({ title: 'Surpresa', text: 'Olha o que preparei pra você!', url: location.href }); addAchievement('Compartilhou'); }
-        else { prompt('Copie o link para compartilhar:', location.href); }
-      } catch (e) { }
-    });
 
     /* safety: ensure decoration is applied on load */
     try { const saved = (function () { try { return localStorage.getItem('decoration') } catch (e) { return null } })(); if (saved) applyDecoration(saved); } catch (e) { }
