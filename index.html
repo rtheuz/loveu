@@ -222,8 +222,13 @@
     }
 
     @keyframes modalFadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     .modal .inner {
@@ -254,7 +259,9 @@
     }
 
     /* Modal controls */
-    .modal-close, .modal-nav, .modal-download {
+    .modal-close,
+    .modal-nav,
+    .modal-download {
       position: fixed;
       background: rgba(255, 255, 255, .15);
       backdrop-filter: blur(10px);
@@ -273,7 +280,9 @@
       user-select: none;
     }
 
-    .modal-close:hover, .modal-nav:hover, .modal-download:hover {
+    .modal-close:hover,
+    .modal-nav:hover,
+    .modal-download:hover {
       background: rgba(255, 255, 255, .25);
       transform: scale(1.1);
     }
@@ -759,7 +768,8 @@
       transform: rotateY(180deg);
     }
 
-    .envelope-front, .envelope-back {
+    .envelope-front,
+    .envelope-back {
       position: absolute;
       width: 100%;
       height: 100%;
@@ -839,8 +849,15 @@
     }
 
     @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
     }
 
     /* Date Ideas Generator */
@@ -895,6 +912,7 @@
         transform: translateX(400px);
         opacity: 0;
       }
+
       to {
         transform: translateX(0);
         opacity: 1;
@@ -918,8 +936,13 @@
     }
 
     @keyframes skeleton-loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+      0% {
+        background-position: 200% 0;
+      }
+
+      100% {
+        background-position: -200% 0;
+      }
     }
 
     /* Enhanced hover effects for cards */
@@ -1009,7 +1032,7 @@
             <div class="tab" data-panel="panel-ideas">Date Ideas</div>
             <div class="tab" data-panel="panel-mood">Mood Board</div>
             <div class="tab" data-panel="panel-album">Álbum</div>
-            <div class="tab" data-panel="panel-more">Mais</div>  
+            <div class="tab" data-panel="panel-more">Mais</div>
           </div>
 
           <div id="panel-playlist" class="panel">
@@ -1057,7 +1080,8 @@
 
           <div id="panel-timeline" class="panel" hidden>
             <div style="margin-bottom:16px;text-align:center">
-              <h2 style="font-family: Pacifico, cursive; color: #ffbfd0; margin-bottom:12px">Nossa Linha do Tempo 💕</h2>
+              <h2 style="font-family: Pacifico, cursive; color: #ffbfd0; margin-bottom:12px">Nossa Linha do Tempo 💕
+              </h2>
               <button id="addTimelineBtn" class="btn">➕ Adicionar Momento</button>
             </div>
             <div id="timelineContainer" class="timeline-container"></div>
@@ -1232,7 +1256,7 @@
     function isVideoUrl(url) { return url && url.split('?')[0].toLowerCase().endsWith('.mp4'); }
 
     /* ===== PERFORMANCE OPTIMIZATIONS ===== */
-    
+
     // Debounce function for scroll/resize events
     function debounce(func, wait) {
       let timeout;
@@ -1249,7 +1273,7 @@
     // Throttle function for high-frequency events
     function throttle(func, limit) {
       let inThrottle;
-      return function(...args) {
+      return function (...args) {
         if (!inThrottle) {
           func.apply(this, args);
           inThrottle = true;
@@ -1294,14 +1318,14 @@
       // Reduce particles on mobile or low-end devices
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       const hasReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      
+
       if (hasReducedMotion) return 0;
       if (isMobile) return 3; // Fewer particles on mobile
-      
+
       // Check for hardware concurrency (number of CPU cores)
       const cores = navigator.hardwareConcurrency || 4;
       if (cores <= 2) return 4;
-      
+
       return 6; // Default for desktop
     }
 
@@ -1497,7 +1521,7 @@
       document.addEventListener('keydown', (e) => {
         if (!modal || !modal.classList.contains('open')) return;
 
-        switch(e.key) {
+        switch (e.key) {
           case 'Escape':
             closeModal();
             break;
@@ -1543,9 +1567,10 @@
     function initTimeline() {
       const container = document.getElementById('timelineContainer');
       const addBtn = document.getElementById('addTimelineBtn');
-      const hojeStr = new Date().toISOString().split('T')[0];
+      const hoje = new Date();
+      const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
 
-      
+
       if (!container) return;
 
       // Load timeline from localStorage
@@ -1564,7 +1589,7 @@
       function renderTimeline() {
         container.innerHTML = '';
         timeline.sort((a, b) => new Date(a.date) - new Date(b.date));
-        
+
         timeline.forEach((item, index) => {
           const div = document.createElement('div');
           div.className = 'timeline-item';
@@ -1582,7 +1607,9 @@
       }
 
       function formatDate(dateStr) {
-        const date = new Date(dateStr);
+        // Corrigido: forçar interpretação como data local ao invés de UTC
+        const [year, month, day] = dateStr.split('-');
+        const date = new Date(year, month - 1, day);
         return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
       }
 
@@ -1598,10 +1625,10 @@
         addBtn.addEventListener('click', () => {
           const date = prompt('Data (AAAA-MM-DD):');
           if (!date) return;
-          
+
           const title = prompt('Título do momento:');
           if (!title) return;
-          
+
           const desc = prompt('Descrição:');
           const icon = prompt('Emoji (opcional):', '💖') || '💖';
 
@@ -1619,7 +1646,7 @@
     function initMessages() {
       const grid = document.getElementById('envelopeGrid');
       const addBtn = document.getElementById('addMessageBtn');
-      
+
       if (!grid) return;
 
       let messages = [];
@@ -1648,7 +1675,7 @@
               <div class="envelope-back">${msg.text}</div>
             </div>
           `;
-          
+
           div.addEventListener('click', () => {
             div.classList.toggle('opened');
             if (!msg.read) {
@@ -1657,7 +1684,7 @@
               saveMessages();
             }
           });
-          
+
           grid.appendChild(div);
         });
       }
@@ -1689,7 +1716,7 @@
     function initCounter() {
       const display = document.getElementById('counterDisplay');
       const milestones = document.getElementById('milestones');
-      
+
       if (!display) return;
 
       // Set your relationship start date here
@@ -1711,7 +1738,7 @@
       function updateCounter() {
         const now = new Date();
         const diff = now - startDate;
-        
+
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -1778,7 +1805,7 @@
       const generateBtn = document.getElementById('generateIdeaBtn');
       const ideaText = document.getElementById('ideaText');
       const ideaCategory = document.getElementById('ideaCategory');
-      
+
       if (!generateBtn || !ideaText) return;
 
       const ideas = [
@@ -1816,11 +1843,11 @@
 
       generateBtn.addEventListener('click', () => {
         const randomIdea = ideas[Math.floor(Math.random() * ideas.length)];
-        
+
         // Animate transition
         ideaText.style.opacity = '0';
         ideaCategory.style.opacity = '0';
-        
+
         setTimeout(() => {
           ideaText.textContent = randomIdea.text;
           ideaCategory.textContent = randomIdea.category;
@@ -1846,7 +1873,7 @@
                 if (!img.dataset.lightboxBound) {
                   img.dataset.lightboxBound = 'true';
                   img.style.cursor = 'pointer';
-                  
+
                   img.addEventListener('click', () => {
                     // Collect all album images
                     const allAlbumImgs = Array.from(albumGrid.querySelectorAll('img'));
@@ -1854,7 +1881,7 @@
                       src: i.src,
                       alt: i.alt || 'Foto do álbum'
                     }));
-                    
+
                     openModal(img.src, img.alt || 'Foto do álbum', imagesList);
                   });
                 }
@@ -1872,14 +1899,14 @@
         if (!img.dataset.lightboxBound) {
           img.dataset.lightboxBound = 'true';
           img.style.cursor = 'pointer';
-          
+
           img.addEventListener('click', () => {
             const allAlbumImgs = Array.from(albumGrid.querySelectorAll('img'));
             const imagesList = allAlbumImgs.map(i => ({
               src: i.src,
               alt: i.alt || 'Foto do álbum'
             }));
-            
+
             openModal(img.src, img.alt || 'Foto do álbum', imagesList);
           });
         }
