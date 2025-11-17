@@ -970,10 +970,215 @@
         transition: none !important
       }
     }
+
+    /* Login Screen Styles */
+    #loginScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #ff80ab 0%, #ff4f8b 50%, #e91e63 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      animation: fadeIn 0.6s ease;
+    }
+
+    #loginScreen.hidden {
+      display: none;
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 40px 50px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      animation: slideUp 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-heart {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      animation: heartBeat 1.5s ease-in-out infinite;
+    }
+
+    @keyframes heartBeat {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.1); }
+      50% { transform: scale(1); }
+    }
+
+    .login-title {
+      font-family: Pacifico, cursive;
+      font-size: 2rem;
+      color: #e91e63;
+      margin-bottom: 10px;
+    }
+
+    .login-subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #ffb3d1;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      transition: all 0.3s;
+      font-family: Montserrat, sans-serif;
+    }
+
+    .login-input:focus {
+      outline: none;
+      border-color: #ff4f8b;
+      box-shadow: 0 0 0 3px rgba(255, 79, 139, 0.1);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #ff80ab, #ff4f8b);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: Montserrat, sans-serif;
+      margin-top: 10px;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 79, 139, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .login-error {
+      color: #f44336;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .login-error.show {
+      opacity: 1;
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    /* Toast Notification Styles */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: rgba(76, 175, 80, 0.95);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      z-index: 100000;
+      animation: toastSlideIn 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+    }
+
+    .toast.error {
+      background: rgba(244, 67, 54, 0.95);
+    }
+
+    @keyframes toastSlideIn {
+      from {
+        opacity: 0;
+        transform: translateX(400px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes toastSlideOut {
+      from {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateX(400px);
+      }
+    }
+
+    /* Hide main content until authenticated */
+    body.not-authenticated #panelToggleHandle,
+    body.not-authenticated #bgMediaWrap,
+    body.not-authenticated #bgOverlay,
+    body.not-authenticated #controlPanel,
+    body.not-authenticated .wrap,
+    body.not-authenticated #modal,
+    body.not-authenticated #cursor {
+      display: none !important;
+    }
   </style>
 </head>
 
-<body>
+<body class="not-authenticated">
+  <!-- Login Screen -->
+  <div id="loginScreen">
+    <div class="login-container">
+      <div class="login-heart">💖</div>
+      <h1 class="login-title">Bem-vindo(a)!</h1>
+      <p class="login-subtitle">Digite a senha especial para continuar</p>
+      <input 
+        type="password" 
+        id="loginPassword" 
+        class="login-input" 
+        placeholder="Senha do coração..." 
+        autocomplete="off"
+      />
+      <button id="loginBtn" class="login-btn">Entrar 💕</button>
+      <div id="loginError" class="login-error">Senha incorreta. Tente novamente!</div>
+    </div>
+  </div>
+
   <!-- Floating toggle handle: always available even if control panel is collapsed or off-screen -->
   <button id="panelToggleHandle" title="Mostrar / Esconder painel">☰</button>
 
@@ -986,8 +1191,9 @@
 
   <!-- Control panel -->
   <div id="controlPanel" aria-label="Painel de controle">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
       <div style="font-weight:700;font-size:.95rem">Painel de controle</div>
+      <button id="logoutBtn" class="btn" style="padding:4px 8px;font-size:0.85rem;background:linear-gradient(135deg,#ff7676,#ffb199)" title="Sair">🚪 Sair</button>
     </div>
     <label style="display:block;font-weight:700;margin-bottom:6px">🌞 Fundo Diurno</label>
     <input id="dayBgInput" placeholder="URL da imagem, .mp4 ou link YouTube"
@@ -1184,6 +1390,214 @@
 
     const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    /* ========================================
+       AUTHENTICATION SYSTEM
+       ======================================== */
+    
+    // Configurable password - change this to your special date or word
+    const AUTH_PASSWORD = "BM2024"; // Change this to your relationship date or special word
+    
+    // Storage keys for data persistence
+    const STORAGE_KEYS = {
+      auth: 'loveu_authenticated',
+      timeline: 'loveu_timeline',
+      messages: 'loveu_messages',
+      settings: 'loveu_settings',
+      gameProgress: 'loveu_game',
+      moodboard: 'loveu_moodboard'
+    };
+
+    // Check if user is already authenticated
+    function checkAuth() {
+      try {
+        return sessionStorage.getItem(STORAGE_KEYS.auth) === 'true';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // Set authentication state
+    function setAuth(isAuth) {
+      try {
+        if (isAuth) {
+          sessionStorage.setItem(STORAGE_KEYS.auth, 'true');
+        } else {
+          sessionStorage.removeItem(STORAGE_KEYS.auth);
+        }
+      } catch (e) {
+        console.error('setAuth error', e);
+      }
+    }
+
+
+
+    // Handle login
+    function handleLogin() {
+      const passwordInput = document.getElementById('loginPassword');
+      const errorDiv = document.getElementById('loginError');
+      const loginScreen = document.getElementById('loginScreen');
+      const password = passwordInput.value;
+
+      if (password === AUTH_PASSWORD) {
+        // Correct password
+        errorDiv.classList.remove('show');
+        setAuth(true);
+        
+        // Animate login screen out
+        loginScreen.style.animation = 'fadeOut 0.5s ease';
+        setTimeout(() => {
+          loginScreen.classList.add('hidden');
+          document.body.classList.remove('not-authenticated');
+          showToast('Bem-vindo(a) de volta! 💖');
+          loadAllData();
+        }, 500);
+      } else {
+        // Wrong password
+        errorDiv.classList.add('show');
+        passwordInput.value = '';
+        passwordInput.focus();
+        
+        // Shake animation
+        setTimeout(() => {
+          errorDiv.classList.remove('show');
+        }, 3000);
+      }
+    }
+
+    // Add fadeOut animation
+    const style = document.createElement('style');
+    style.textContent = '@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }';
+    document.head.appendChild(style);
+
+    // Handle logout
+    function handleLogout() {
+      if (confirm('Tem certeza que deseja sair?')) {
+        setAuth(false);
+        location.reload();
+      }
+    }
+
+    // Initialize authentication
+    function initAuth() {
+      const loginBtn = document.getElementById('loginBtn');
+      const loginPassword = document.getElementById('loginPassword');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const loginScreen = document.getElementById('loginScreen');
+
+      // Check if already authenticated
+      if (checkAuth()) {
+        loginScreen.classList.add('hidden');
+        document.body.classList.remove('not-authenticated');
+        loadAllData();
+      } else {
+        // Focus password input
+        setTimeout(() => loginPassword.focus(), 300);
+      }
+
+      // Login button click
+      if (loginBtn) {
+        loginBtn.addEventListener('click', handleLogin);
+      }
+
+      // Enter key on password input
+      if (loginPassword) {
+        loginPassword.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            handleLogin();
+          }
+        });
+      }
+
+      // Logout button
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+      }
+    }
+
+    /* ========================================
+       DATA PERSISTENCE SYSTEM
+       ======================================== */
+
+    // Save data to localStorage
+    function saveData(key, data) {
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+        return true;
+      } catch (e) {
+        console.error('saveData error', e);
+        return false;
+      }
+    }
+
+    // Load data from localStorage
+    function loadData(key, defaultValue = null) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : defaultValue;
+      } catch (e) {
+        console.error('loadData error', e);
+        return defaultValue;
+      }
+    }
+
+    // Load all persisted data
+    function loadAllData() {
+      loadTimelineData();
+      loadMessagesData();
+      loadSettingsData();
+    }
+
+    // Timeline and Messages will use their own existing localStorage keys
+    // We just need to integrate the toast notifications
+    function loadTimelineData() {
+      // Timeline already loads from 'TIMELINE_EVENTS' in initTimeline
+    }
+
+    function loadMessagesData() {
+      // Messages already load from 'LOVE_MESSAGES' in initMessages
+    }
+
+    // Save and load settings (backgrounds, playlist)
+    function loadSettingsData() {
+      const settings = loadData(STORAGE_KEYS.settings, null);
+      if (settings) {
+        if (settings.dayBg) document.getElementById('dayBgInput').value = settings.dayBg;
+        if (settings.nightBg) document.getElementById('nightBgInput').value = settings.nightBg;
+        if (settings.spotifyUrl) document.getElementById('spotifyInput').value = settings.spotifyUrl;
+        if (settings.decoration) document.getElementById('decorationSelect').value = settings.decoration;
+      }
+    }
+
+    function saveSettingsData() {
+      const settings = {
+        dayBg: document.getElementById('dayBgInput').value,
+        nightBg: document.getElementById('nightBgInput').value,
+        spotifyUrl: document.getElementById('spotifyInput').value,
+        decoration: document.getElementById('decorationSelect').value
+      };
+      saveData(STORAGE_KEYS.settings, settings);
+    }
+
+    // Auto-save settings when changed
+    function initAutoSaveSettings() {
+      const inputs = ['dayBgInput', 'nightBgInput', 'spotifyInput', 'decorationSelect'];
+      inputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('change', () => {
+            saveSettingsData();
+            showToast('Configurações salvas! ⚙️');
+          });
+        }
+      });
+    }
+
+    // Initialize authentication on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      initAuth();
+      initAutoSaveSettings();
+    });
+
     /* Typing message */
     const messageEl = document.getElementById('message');
     const text = "AMOOR DA MINHA VIDA, MINHA GATINHAA 💫";
@@ -1355,11 +1769,12 @@
     // Helper function to show toast notifications
     function showToast(message, type = 'success') {
       const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      toast.textContent = message;
+      const isError = type === 'error' || type === false;
+      toast.className = 'toast' + (isError ? ' error' : '');
+      toast.innerHTML = `<span>${isError ? '❌' : '✓'}</span><span>${message}</span>`;
       document.body.appendChild(toast);
       setTimeout(() => {
-        toast.style.animation = 'slideInRight .3s ease reverse';
+        toast.style.animation = 'toastSlideOut 0.3s ease';
         setTimeout(() => toast.remove(), 300);
       }, 3000);
     }
