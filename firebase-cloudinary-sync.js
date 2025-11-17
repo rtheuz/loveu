@@ -42,7 +42,7 @@
 
   // Upload sem delete_token
   async function uploadToCloudinary(file) {
-    const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+    const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
     const fd = new FormData();
     fd.append('file', file);
     fd.append('upload_preset', UPLOAD_PRESET);
