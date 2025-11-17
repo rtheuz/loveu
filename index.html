@@ -1097,9 +1097,6 @@
               <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
                 <input id="albumFiles" type="file" accept="image/*" multiple />
                 <button id="albumUploadBtn" class="btn">📤 Enviar</button>
-                <button id="albumExportBtn" class="btn small">📦 Exportar</button>
-                <input id="albumImportFile" type="file" accept=".json" style="display:none" />
-                <button id="albumImportBtn" class="btn small">📥 Importar</button>
               </div>
               <div id="albumGrid"
                 style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px"></div>
@@ -1546,6 +1543,8 @@
     function initTimeline() {
       const container = document.getElementById('timelineContainer');
       const addBtn = document.getElementById('addTimelineBtn');
+      const hojeStr = new Date().toISOString().split('T')[0];
+
       
       if (!container) return;
 
@@ -1554,9 +1553,9 @@
       try {
         const saved = localStorage.getItem('TIMELINE_EVENTS');
         timeline = saved ? JSON.parse(saved) : [
-          { date: '2024-08-04', title: 'Primeiro Beijo', desc: 'Um momento mágico 💋', icon: '😘' },
-          { date: '2024-08-06', title: 'Primeiro Encontro', desc: 'O início de tudo ❤️', icon: '💕' },
-          { date: '2024-11-14', title: 'Hoje', desc: 'Cada dia mais apaixonados', icon: '🌟' }
+          { date: '2023-08-04', title: 'Primeiro Beijo', desc: 'Um momento mágico 💋', icon: '😘' },
+          { date: '2023-08-06', title: 'Primeiro Encontro', desc: 'O início de tudo ❤️', icon: '💕' },
+          { date: hojeStr, title: 'Hoje', desc: 'Cada dia mais apaixonados', icon: '🌟' }
         ];
       } catch (e) {
         timeline = [];
@@ -1797,7 +1796,22 @@
         { text: 'Visitar um café novo na cidade ☕', category: 'Cultural' },
         { text: 'Tirar fotos juntos em lugares bonitos 📸', category: 'Aventura' },
         { text: 'Escrever cartas de amor um para o outro 💌', category: 'Romance' },
-        { text: 'Fazer um álbum de fotos ou scrapbook juntos 📔', category: 'Criativo' }
+        { text: 'Fazer um álbum de fotos ou scrapbook juntos 📔', category: 'Criativo' },
+        { text: 'Experimentar um novo hobby juntos, como pintura ou jardinagem 🎨', category: 'Criativo' },
+        { text: 'Planejar uma viagem futura e pesquisar destinos juntos 🌍', category: 'Aventura' },
+        { text: 'Fazer uma degustação de vinhos ou queijos em casa 🍷', category: 'Relaxar' },
+        { text: 'Ir a um parque de diversões ou feira local 🎡', category: 'Diversão' },
+        { text: 'Fazer uma sessão de meditação ou yoga juntos 🧘', category: 'Relaxar' },
+        { text: 'Visitar um mercado de pulgas ou feira de artesanato 🛍️', category: 'Cultural' },
+        { text: 'Fazer um desafio culinário onde cada um prepara um prato surpresa 🍽️', category: 'Aventura' },
+        { text: 'Criar uma playlist de músicas que representam o relacionamento de vocês 🎶', category: 'Criativo' },
+        { text: 'Fazer um tour gastronômico pela cidade, experimentando comidas de diferentes culturas 🍜', category: 'Cultural' },
+        { text: 'Participar de uma aula online juntos, como fotografia ou escrita criativa 📚', category: 'Criativo' },
+        { text: 'Fazer um dia de voluntariado juntos em uma causa que ambos apoiam 🤝', category: 'Cultural' },
+        { text: 'Construir algo juntos, como um móvel ou uma peça de decoração 🛠️', category: 'Criativo' },
+        { text: 'Fazer uma noite temática em casa, como uma noite italiana ou mexicana 🌮', category: 'Diversão' },
+        { text: 'Ir a um planetário ou observatório para aprender sobre o universo 🌌', category: 'Cultural' },
+        { text: 'Fazer um passeio de bicicleta por um parque ou trilha local 🚴', category: 'Aventura' }
       ];
 
       generateBtn.addEventListener('click', () => {
