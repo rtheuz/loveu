@@ -2315,13 +2315,15 @@
         const now = new Date();
         const diff = now - startDate;
 
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const totalDays = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-        const years = Math.floor(days / 365);
-        const months = Math.floor((days % 365) / 30);
+        const years = Math.floor(totalDays / 365);
+        const daysAfterYears = totalDays % 365;
+        const months = Math.floor(daysAfterYears / 30);
+        const days = daysAfterYears % 30;
 
         display.innerHTML = `
           <div class="counter-unit">
@@ -2362,7 +2364,7 @@
           ];
 
           markers.forEach(marker => {
-            if (days >= marker.days) {
+            if (totalDays >= marker.days) {
               const span = document.createElement('span');
               span.className = 'milestone';
               span.textContent = marker.text;
