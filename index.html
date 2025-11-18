@@ -1978,153 +1978,314 @@
       }
     });
 
-    /* ===== TIMELINE FEATURE ===== */
+    /* ===== TIMELINE FEATURE WITH FIREBASE ===== */
     function initTimeline() {
       const container = document.getElementById('timelineContainer');
       const addBtn = document.getElementById('addTimelineBtn');
       const hoje = new Date();
       const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
 
-
       if (!container) return;
 
-      // Load timeline from localStorage
-      let timeline = [];
-      try {
-        const saved = localStorage.getItem('TIMELINE_EVENTS');
-        timeline = saved ? JSON.parse(saved) : [
-          { date: '2023-08-04', title: 'Primeiro Beijo', desc: 'Um momento mágico 💋', icon: '😘' },
-          { date: '2023-08-06', title: 'Primeiro Encontro', desc: 'O início de tudo ❤️', icon: '💕' },
-          { date: hojeStr, title: 'Hoje', desc: 'Cada dia mais apaixonados', icon: '🌟' }
-        ];
-      } catch (e) {
-        timeline = [];
-      }
-
-      function renderTimeline() {
-        container.innerHTML = '';
-        timeline.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-        timeline.forEach((item, index) => {
-          const div = document.createElement('div');
-          div.className = 'timeline-item';
-          div.style.animationDelay = `${index * 0.1}s`;
-          div.innerHTML = `
-            <div class="timeline-icon">${item.icon}</div>
-            <div class="timeline-content">
-              <div class="timeline-date">${formatDate(item.date)}</div>
-              <div class="timeline-title">${item.title}</div>
-              <div class="timeline-desc">${item.desc}</div>
-            </div>
-          `;
-          container.appendChild(div);
-        });
-      }
+      // Check if Firebase is available
+      const useFirebase = typeof firebase !== 'undefined' && firebase.firestore;
 
       function formatDate(dateStr) {
-        // Corrigido: forçar interpretação como data local ao invés de UTC
         const [year, month, day] = dateStr.split('-');
         const date = new Date(year, month - 1, day);
         return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
       }
 
-      function saveTimeline() {
-        try {
-          localStorage.setItem('TIMELINE_EVENTS', JSON.stringify(timeline));
-        } catch (e) {
-          console.error('Failed to save timeline', e);
-        }
+      function renderTimelineItem(docId, item, index) {
+        const div = document.createElement('div');
+        div.className = 'timeline-item';
+        div.style.animationDelay = `${index * 0.1}s`;
+        div.innerHTML = `
+          <div class="timeline-icon">${item.icon}</div>
+          <div class="timeline-content">
+            <div class="timeline-date">${formatDate(item.date)}</div>
+            <div class="timeline-title">${item.title}</div>
+            <div class="timeline-desc">${item.desc}</div>
+          </div>
+        `;
+        return div;
       }
 
-      if (addBtn) {
-        addBtn.addEventListener('click', () => {
-          const date = prompt('Data (AAAA-MM-DD):');
-          if (!date) return;
-
-          const title = prompt('Título do momento:');
-          if (!title) return;
-
-          const desc = prompt('Descrição:');
-          const icon = prompt('Emoji (opcional):', '💖') || '💖';
-
-          timeline.push({ date, title, desc: desc || '', icon });
-          saveTimeline();
-          renderTimeline();
-          showToast('Momento adicionado à linha do tempo!');
+      if (useFirebase) {
+        // Firebase Firestore implementation
+        const db = firebase.firestore();
+        
+        // Real-time listener for timeline events
+        db.collection('timeline').orderBy('date', 'asc').onSnapshot(snapshot => {
+          container.innerHTML = '';
+          
+          // If no events exist, add default ones
+          if (snapshot.empty) {
+            const defaultEvents = [
+              { date: '2023-08-04', title: 'Primeiro Beijo', desc: 'Um momento mágico 💋', icon: '😘' },
+              { date: '2023-08-06', title: 'Primeiro Encontro', desc: 'O início de tudo ❤️', icon: '💕' },
+              { date: hojeStr, title: 'Hoje', desc: 'Cada dia mais apaixonados', icon: '🌟' }
+            ];
+            
+            // Add default events to Firestore
+            defaultEvents.forEach(event => {
+              db.collection('timeline').add({
+                ...event,
+                ts: firebase.firestore.FieldValue.serverTimestamp()
+              }).catch(err => console.error('Error adding default timeline event:', err));
+            });
+          } else {
+            snapshot.forEach((doc, index) => {
+              const data = doc.data();
+              const el = renderTimelineItem(doc.id, data, index);
+              container.appendChild(el);
+            });
+          }
+        }, err => {
+          console.error('Error listening to timeline:', err);
+          // Fallback to localStorage
+          initTimelineLocalStorage();
         });
+
+        // Add button handler for Firebase
+        if (addBtn) {
+          addBtn.addEventListener('click', async () => {
+            const date = prompt('Data (AAAA-MM-DD):');
+            if (!date) return;
+
+            const title = prompt('Título do momento:');
+            if (!title) return;
+
+            const desc = prompt('Descrição:');
+            const icon = prompt('Emoji (opcional):', '💖') || '💖';
+
+            try {
+              await db.collection('timeline').add({
+                date,
+                title,
+                desc: desc || '',
+                icon,
+                ts: firebase.firestore.FieldValue.serverTimestamp()
+              });
+              showToast('Momento adicionado à linha do tempo! 💝');
+            } catch (err) {
+              console.error('Error adding timeline event:', err);
+              showToast('Erro ao adicionar momento. Tente novamente.', 'error');
+            }
+          });
+        }
+      } else {
+        // Fallback to localStorage
+        initTimelineLocalStorage();
       }
 
-      renderTimeline();
+      function initTimelineLocalStorage() {
+        let timeline = [];
+        try {
+          const saved = localStorage.getItem('TIMELINE_EVENTS');
+          timeline = saved ? JSON.parse(saved) : [
+            { date: '2023-08-04', title: 'Primeiro Beijo', desc: 'Um momento mágico 💋', icon: '😘' },
+            { date: '2023-08-06', title: 'Primeiro Encontro', desc: 'O início de tudo ❤️', icon: '💕' },
+            { date: hojeStr, title: 'Hoje', desc: 'Cada dia mais apaixonados', icon: '🌟' }
+          ];
+        } catch (e) {
+          timeline = [];
+        }
+
+        function renderTimeline() {
+          container.innerHTML = '';
+          timeline.sort((a, b) => new Date(a.date) - new Date(b.date));
+          timeline.forEach((item, index) => {
+            const el = renderTimelineItem(null, item, index);
+            container.appendChild(el);
+          });
+        }
+
+        function saveTimeline() {
+          try {
+            localStorage.setItem('TIMELINE_EVENTS', JSON.stringify(timeline));
+          } catch (e) {
+            console.error('Failed to save timeline', e);
+          }
+        }
+
+        if (addBtn) {
+          addBtn.addEventListener('click', () => {
+            const date = prompt('Data (AAAA-MM-DD):');
+            if (!date) return;
+
+            const title = prompt('Título do momento:');
+            if (!title) return;
+
+            const desc = prompt('Descrição:');
+            const icon = prompt('Emoji (opcional):', '💖') || '💖';
+
+            timeline.push({ date, title, desc: desc || '', icon });
+            saveTimeline();
+            renderTimeline();
+            showToast('Momento adicionado à linha do tempo!');
+          });
+        }
+
+        renderTimeline();
+      }
     }
 
-    /* ===== MESSAGES/ENVELOPES FEATURE ===== */
+    /* ===== MESSAGES/ENVELOPES FEATURE WITH FIREBASE ===== */
     function initMessages() {
       const grid = document.getElementById('envelopeGrid');
       const addBtn = document.getElementById('addMessageBtn');
 
       if (!grid) return;
 
-      let messages = [];
-      try {
-        const saved = localStorage.getItem('LOVE_MESSAGES');
-        messages = saved ? JSON.parse(saved) : [
-          { text: 'Você é a melhor coisa que já me aconteceu! 💕', read: false },
-          { text: 'Cada dia ao seu lado é uma bênção ✨', read: false },
-          { text: 'Meu amor por você cresce a cada segundo 💗', read: false },
-          { text: 'Obrigado por ser minha felicidade 🌈', read: false }
-        ];
-      } catch (e) {
-        messages = [];
+      // Check if Firebase is available
+      const useFirebase = typeof firebase !== 'undefined' && firebase.firestore;
+
+      function renderMessageItem(docId, msg) {
+        const div = document.createElement('div');
+        div.className = `envelope ${msg.read ? 'read' : ''}`;
+        div.innerHTML = `
+          <div class="envelope-inner">
+            <div class="envelope-front">
+              <div class="envelope-icon">💌</div>
+            </div>
+            <div class="envelope-back">${msg.text}</div>
+          </div>
+        `;
+
+        div.addEventListener('click', () => {
+          div.classList.toggle('opened');
+          if (!msg.read && useFirebase && docId) {
+            // Update read status in Firebase
+            const db = firebase.firestore();
+            db.collection('messages').doc(docId).update({
+              read: true
+            }).catch(err => console.error('Error updating message:', err));
+          } else if (!msg.read && !useFirebase) {
+            // Update in localStorage
+            msg.read = true;
+            div.classList.add('read');
+          }
+        });
+
+        return div;
       }
 
-      function renderMessages() {
-        grid.innerHTML = '';
-        messages.forEach((msg, index) => {
-          const div = document.createElement('div');
-          div.className = `envelope ${msg.read ? 'read' : ''}`;
-          div.innerHTML = `
-            <div class="envelope-inner">
-              <div class="envelope-front">
-                <div class="envelope-icon">💌</div>
-              </div>
-              <div class="envelope-back">${msg.text}</div>
-            </div>
-          `;
+      if (useFirebase) {
+        // Firebase Firestore implementation
+        const db = firebase.firestore();
+        
+        // Real-time listener for messages
+        db.collection('messages').orderBy('ts', 'asc').onSnapshot(snapshot => {
+          grid.innerHTML = '';
+          
+          // If no messages exist, add default ones
+          if (snapshot.empty) {
+            const defaultMessages = [
+              { text: 'Você é a melhor coisa que já me aconteceu! 💕', read: false },
+              { text: 'Cada dia ao seu lado é uma bênção ✨', read: false },
+              { text: 'Meu amor por você cresce a cada segundo 💗', read: false },
+              { text: 'Obrigado por ser minha felicidade 🌈', read: false }
+            ];
+            
+            // Add default messages to Firestore
+            defaultMessages.forEach(msg => {
+              db.collection('messages').add({
+                ...msg,
+                ts: firebase.firestore.FieldValue.serverTimestamp()
+              }).catch(err => console.error('Error adding default message:', err));
+            });
+          } else {
+            snapshot.forEach(doc => {
+              const data = doc.data();
+              const el = renderMessageItem(doc.id, data);
+              grid.appendChild(el);
+            });
+          }
+        }, err => {
+          console.error('Error listening to messages:', err);
+          // Fallback to localStorage
+          initMessagesLocalStorage();
+        });
 
-          div.addEventListener('click', () => {
-            div.classList.toggle('opened');
-            if (!msg.read) {
-              msg.read = true;
-              div.classList.add('read');
-              saveMessages();
+        // Add button handler for Firebase
+        if (addBtn) {
+          addBtn.addEventListener('click', async () => {
+            const text = prompt('Digite sua mensagem de amor:');
+            if (!text) return;
+
+            try {
+              await db.collection('messages').add({
+                text,
+                read: false,
+                ts: firebase.firestore.FieldValue.serverTimestamp()
+              });
+              showToast('Mensagem adicionada! 💌');
+            } catch (err) {
+              console.error('Error adding message:', err);
+              showToast('Erro ao adicionar mensagem. Tente novamente.', 'error');
             }
           });
-
-          grid.appendChild(div);
-        });
-      }
-
-      function saveMessages() {
-        try {
-          localStorage.setItem('LOVE_MESSAGES', JSON.stringify(messages));
-        } catch (e) {
-          console.error('Failed to save messages', e);
         }
+      } else {
+        // Fallback to localStorage
+        initMessagesLocalStorage();
       }
 
-      if (addBtn) {
-        addBtn.addEventListener('click', () => {
-          const text = prompt('Digite sua mensagem de amor:');
-          if (!text) return;
+      function initMessagesLocalStorage() {
+        let messages = [];
+        try {
+          const saved = localStorage.getItem('LOVE_MESSAGES');
+          messages = saved ? JSON.parse(saved) : [
+            { text: 'Você é a melhor coisa que já me aconteceu! 💕', read: false },
+            { text: 'Cada dia ao seu lado é uma bênção ✨', read: false },
+            { text: 'Meu amor por você cresce a cada segundo 💗', read: false },
+            { text: 'Obrigado por ser minha felicidade 🌈', read: false }
+          ];
+        } catch (e) {
+          messages = [];
+        }
 
-          messages.push({ text, read: false });
-          saveMessages();
-          renderMessages();
-          showToast('Mensagem adicionada! 💌');
-        });
+        function renderMessages() {
+          grid.innerHTML = '';
+          messages.forEach((msg, index) => {
+            const el = renderMessageItem(null, msg);
+            
+            // Add localStorage save on click
+            el.addEventListener('click', () => {
+              if (!msg.read) {
+                msg.read = true;
+                el.classList.add('read');
+                saveMessages();
+              }
+            });
+            
+            grid.appendChild(el);
+          });
+        }
+
+        function saveMessages() {
+          try {
+            localStorage.setItem('LOVE_MESSAGES', JSON.stringify(messages));
+          } catch (e) {
+            console.error('Failed to save messages', e);
+          }
+        }
+
+        if (addBtn) {
+          addBtn.addEventListener('click', () => {
+            const text = prompt('Digite sua mensagem de amor:');
+            if (!text) return;
+
+            messages.push({ text, read: false });
+            saveMessages();
+            renderMessages();
+            showToast('Mensagem adicionada! 💌');
+          });
+        }
+
+        renderMessages();
       }
-
-      renderMessages();
     }
 
     /* ===== RELATIONSHIP COUNTER ===== */
