@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="Uma surpresa romântica com músicas, lembranças e mensagens." />
   <meta name="theme-color" content="#ff80ab" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Montserrat:wght@400;600&display=swap');
 
@@ -337,6 +338,144 @@
       transform: translate(-50%, -50%);
       color: #fff;
       font-size: 18px;
+    }
+
+    /* Form modals for messages and timeline */
+    .form-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1200;
+      padding: 20px;
+    }
+
+    .form-modal.open {
+      display: flex;
+      animation: modalFadeIn .3s ease forwards;
+    }
+
+    .form-modal-content {
+      background: linear-gradient(135deg, rgba(255, 128, 171, 0.15), rgba(255, 79, 139, 0.1));
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 128, 171, 0.3);
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .form-modal-header {
+      font-family: Pacifico, cursive;
+      font-size: 1.8rem;
+      color: #ffbfd0;
+      text-align: center;
+      margin-bottom: 24px;
+      text-shadow: 0 0 12px rgba(255, 105, 180, .85);
+    }
+
+    .form-modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .form-modal-close:hover {
+      background: rgba(255, 79, 139, 0.8);
+      transform: rotate(90deg);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #ffbfd0;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(255, 128, 171, 0.3);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent-1);
+      box-shadow: 0 0 0 3px rgba(255, 128, 171, 0.2);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .form-modal-actions button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+
+    .form-modal-actions .btn-submit {
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      color: #fff;
+    }
+
+    .form-modal-actions .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 79, 139, 0.4);
+    }
+
+    .form-modal-actions .btn-cancel {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .form-modal-actions .btn-cancel:hover {
+      background: rgba(255, 255, 255, 0.15);
     }
 
     /* game */
@@ -1381,6 +1520,54 @@
     <div class="modal-counter" id="modalCounter" style="display:none"></div>
   </div>
 
+  <!-- Message Modal -->
+  <div id="messageModal" class="form-modal">
+    <div class="form-modal-content">
+      <button class="form-modal-close" id="messageModalClose" aria-label="Fechar">✕</button>
+      <h3 class="form-modal-header">💌 Nova Mensagem</h3>
+      <form id="messageForm">
+        <div class="form-group">
+          <label for="newMessageContent">Mensagem de Amor</label>
+          <textarea id="newMessageContent" placeholder="Escreva sua mensagem aqui..." required></textarea>
+        </div>
+        <div class="form-modal-actions">
+          <button type="button" class="btn-cancel" id="messageModalCancel">Cancelar</button>
+          <button type="submit" class="btn-submit">💕 Adicionar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Timeline Modal -->
+  <div id="timelineModal" class="form-modal">
+    <div class="form-modal-content">
+      <button class="form-modal-close" id="timelineModalClose" aria-label="Fechar">✕</button>
+      <h3 class="form-modal-header">✨ Novo Momento</h3>
+      <form id="timelineForm">
+        <div class="form-group">
+          <label for="timelineDate">Data</label>
+          <input type="date" id="timelineDate" required />
+        </div>
+        <div class="form-group">
+          <label for="timelineTitle">Título</label>
+          <input type="text" id="timelineTitle" placeholder="Ex: Primeiro Encontro" required />
+        </div>
+        <div class="form-group">
+          <label for="timelineDesc">Descrição</label>
+          <textarea id="timelineDesc" placeholder="Descreva este momento especial..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="timelineIcon">Emoji (opcional)</label>
+          <input type="text" id="timelineIcon" placeholder="💖" maxlength="2" />
+        </div>
+        <div class="form-modal-actions">
+          <button type="button" class="btn-cancel" id="timelineModalCancel">Cancelar</button>
+          <button type="submit" class="btn-submit">✨ Adicionar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="cursor" class="cursor" aria-hidden="true">
     <div class="trail"></div>
     <div class="core"></div>
@@ -2047,17 +2234,45 @@
           initTimelineLocalStorage();
         });
 
-        // Add button handler for Firebase
+        // Add button handler for Firebase - open modal
         if (addBtn) {
-          addBtn.addEventListener('click', async () => {
-            const date = prompt('Data (AAAA-MM-DD):');
-            if (!date) return;
+          addBtn.addEventListener('click', () => {
+            const modal = document.getElementById('timelineModal');
+            if (modal) modal.classList.add('open');
+          });
+        }
 
-            const title = prompt('Título do momento:');
-            if (!title) return;
+        // Setup timeline modal handlers
+        const timelineModal = document.getElementById('timelineModal');
+        const timelineForm = document.getElementById('timelineForm');
+        const timelineModalClose = document.getElementById('timelineModalClose');
+        const timelineModalCancel = document.getElementById('timelineModalCancel');
 
-            const desc = prompt('Descrição:');
-            const icon = prompt('Emoji (opcional):', '💖') || '💖';
+        if (timelineModalClose) {
+          timelineModalClose.addEventListener('click', () => {
+            timelineModal.classList.remove('open');
+          });
+        }
+
+        if (timelineModalCancel) {
+          timelineModalCancel.addEventListener('click', () => {
+            timelineModal.classList.remove('open');
+          });
+        }
+
+        if (timelineForm) {
+          timelineForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const date = document.getElementById('timelineDate').value;
+            const title = document.getElementById('timelineTitle').value.trim();
+            const desc = document.getElementById('timelineDesc').value.trim();
+            const icon = document.getElementById('timelineIcon').value.trim() || '💖';
+
+            if (!date || !title) {
+              showToast('Por favor, preencha data e título!', 'error');
+              return;
+            }
 
             try {
               await db.collection('timeline').add({
@@ -2067,10 +2282,13 @@
                 icon,
                 ts: firebase.firestore.FieldValue.serverTimestamp()
               });
-              showToast('Momento adicionado à linha do tempo! 💝');
+              
+              showToast('Evento adicionado à timeline! ✨', 'success');
+              timelineForm.reset();
+              timelineModal.classList.remove('open');
             } catch (err) {
               console.error('Error adding timeline event:', err);
-              showToast('Erro ao adicionar momento. Tente novamente.', 'error');
+              showToast('Erro ao adicionar evento. Verifique as permissões.', 'error');
             }
           });
         }
@@ -2111,19 +2329,49 @@
 
         if (addBtn) {
           addBtn.addEventListener('click', () => {
-            const date = prompt('Data (AAAA-MM-DD):');
-            if (!date) return;
+            const modal = document.getElementById('timelineModal');
+            if (modal) modal.classList.add('open');
+          });
+        }
 
-            const title = prompt('Título do momento:');
-            if (!title) return;
+        // Setup timeline modal handlers for localStorage
+        const timelineModal = document.getElementById('timelineModal');
+        const timelineForm = document.getElementById('timelineForm');
+        const timelineModalClose = document.getElementById('timelineModalClose');
+        const timelineModalCancel = document.getElementById('timelineModalCancel');
 
-            const desc = prompt('Descrição:');
-            const icon = prompt('Emoji (opcional):', '💖') || '💖';
+        if (timelineModalClose) {
+          timelineModalClose.addEventListener('click', () => {
+            timelineModal.classList.remove('open');
+          });
+        }
+
+        if (timelineModalCancel) {
+          timelineModalCancel.addEventListener('click', () => {
+            timelineModal.classList.remove('open');
+          });
+        }
+
+        if (timelineForm) {
+          timelineForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const date = document.getElementById('timelineDate').value;
+            const title = document.getElementById('timelineTitle').value.trim();
+            const desc = document.getElementById('timelineDesc').value.trim();
+            const icon = document.getElementById('timelineIcon').value.trim() || '💖';
+
+            if (!date || !title) {
+              showToast('Por favor, preencha data e título!', 'error');
+              return;
+            }
 
             timeline.push({ date, title, desc: desc || '', icon });
             saveTimeline();
             renderTimeline();
-            showToast('Momento adicionado à linha do tempo!');
+            showToast('Evento adicionado à timeline! ✨', 'success');
+            timelineForm.reset();
+            timelineModal.classList.remove('open');
           });
         }
 
@@ -2208,22 +2456,55 @@
           initMessagesLocalStorage();
         });
 
-        // Add button handler for Firebase
+        // Add button handler for Firebase - open modal
         if (addBtn) {
-          addBtn.addEventListener('click', async () => {
-            const text = prompt('Digite sua mensagem de amor:');
-            if (!text) return;
+          addBtn.addEventListener('click', () => {
+            const modal = document.getElementById('messageModal');
+            if (modal) modal.classList.add('open');
+          });
+        }
+
+        // Setup message modal handlers
+        const messageModal = document.getElementById('messageModal');
+        const messageForm = document.getElementById('messageForm');
+        const messageModalClose = document.getElementById('messageModalClose');
+        const messageModalCancel = document.getElementById('messageModalCancel');
+
+        if (messageModalClose) {
+          messageModalClose.addEventListener('click', () => {
+            messageModal.classList.remove('open');
+          });
+        }
+
+        if (messageModalCancel) {
+          messageModalCancel.addEventListener('click', () => {
+            messageModal.classList.remove('open');
+          });
+        }
+
+        if (messageForm) {
+          messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const content = document.getElementById('newMessageContent').value.trim();
+            if (!content) {
+              showToast('Por favor, escreva uma mensagem!', 'error');
+              return;
+            }
 
             try {
               await db.collection('messages').add({
-                text,
+                text: content,
                 read: false,
                 ts: firebase.firestore.FieldValue.serverTimestamp()
               });
-              showToast('Mensagem adicionada! 💌');
+              
+              showToast('Mensagem adicionada com sucesso! 💌', 'success');
+              messageForm.reset();
+              messageModal.classList.remove('open');
             } catch (err) {
               console.error('Error adding message:', err);
-              showToast('Erro ao adicionar mensagem. Tente novamente.', 'error');
+              showToast('Erro ao adicionar mensagem. Verifique as permissões.', 'error');
             }
           });
         }
@@ -2274,13 +2555,45 @@
 
         if (addBtn) {
           addBtn.addEventListener('click', () => {
-            const text = prompt('Digite sua mensagem de amor:');
-            if (!text) return;
+            const modal = document.getElementById('messageModal');
+            if (modal) modal.classList.add('open');
+          });
+        }
 
-            messages.push({ text, read: false });
+        // Setup message modal handlers for localStorage
+        const messageModal = document.getElementById('messageModal');
+        const messageForm = document.getElementById('messageForm');
+        const messageModalClose = document.getElementById('messageModalClose');
+        const messageModalCancel = document.getElementById('messageModalCancel');
+
+        if (messageModalClose) {
+          messageModalClose.addEventListener('click', () => {
+            messageModal.classList.remove('open');
+          });
+        }
+
+        if (messageModalCancel) {
+          messageModalCancel.addEventListener('click', () => {
+            messageModal.classList.remove('open');
+          });
+        }
+
+        if (messageForm) {
+          messageForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const content = document.getElementById('newMessageContent').value.trim();
+            if (!content) {
+              showToast('Por favor, escreva uma mensagem!', 'error');
+              return;
+            }
+
+            messages.push({ text: content, read: false });
             saveMessages();
             renderMessages();
-            showToast('Mensagem adicionada! 💌');
+            showToast('Mensagem adicionada com sucesso! 💌', 'success');
+            messageForm.reset();
+            messageModal.classList.remove('open');
           });
         }
 
@@ -2534,6 +2847,26 @@
       enhanceAlbumImages(); // Set up album images with lightbox
 
       loadAchievements(); // render persisted achievements
+
+      // Close modals when clicking outside
+      const messageModal = document.getElementById('messageModal');
+      const timelineModal = document.getElementById('timelineModal');
+      
+      if (messageModal) {
+        messageModal.addEventListener('click', (e) => {
+          if (e.target === messageModal) {
+            messageModal.classList.remove('open');
+          }
+        });
+      }
+      
+      if (timelineModal) {
+        timelineModal.addEventListener('click', (e) => {
+          if (e.target === timelineModal) {
+            timelineModal.classList.remove('open');
+          }
+        });
+      }
     });
 
     /* Cursor */
