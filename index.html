@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <title>💖 B & M 💖</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Uma surpresa romântica com músicas, lembranças e mensagens." />
+  <meta name="theme-color" content="#ff80ab" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Montserrat:wght@400;600&display=swap');
+
+    :root {
+      --accent-1: #ff80ab;
+      --accent-2: #ff4f8b;
+      --glass: rgba(255, 255, 255, 0.10);
+      --control-bg: rgba(0, 0, 0, 0.5);
+      --bg-dark: #0b0710;
+      --bg-light: #000;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      font-family: Montserrat, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      color: #fff;
+      background: var(--bg-light) center/cover no-repeat fixed;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background .6s, color .4s;
+    }
+
+    /* layout */
+    .wrap {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px;
+      gap: 20px
+    }
+
+    .container {
+      background: var(--glass);
+      backdrop-filter: blur(6px);
+      padding: 20px;
+      border-radius: 14px;
+      max-width: 1100px;
+      width: 100%;
+      box-shadow: 0 6px 30px rgba(0, 0, 0, .45)
+    }
+
+    h1 {
+      font-family: Pacifico, cursive;
+      font-size: clamp(1.9rem, 5vw, 2.6rem);
+      text-align: center;
+      color: #ffbfd0;
+      margin: 18px 0;
+      text-shadow: 0 0 12px rgba(255, 105, 180, .85)
+    }
+
+    .top {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      flex-wrap: wrap
+    }
+
+    .photo {
+      width: 220px;
+      min-width: 140px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 3px solid rgba(233, 30, 99, .9);
+      flex-shrink: 0
+    }
+
+    .photo img {
+      display: block;
+      width: 100%;
+      height: auto;
+      cursor: pointer
+    }
+
+    .maincol {
+      flex: 1;
+      min-width: 260px
+    }
+
+    .message {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+      text-shadow: 0 0 8px rgba(0, 0, 0, .7)
+    }
+
+    /* controls */
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px
+    }
+
+    .btn {
+      padding: 10px 14px;
+      border-radius: 20px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(255, 80, 130, .12)
+    }
+
+    .small {
+      font-size: .9rem;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, .12)
+    }
+
+    /* spotify */
+    .spotify-box {
+      margin-top: 12px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 18px rgba(0, 0, 0, .35);
+      background: rgba(0, 0, 0, .15)
+    }
+
+    iframe.spotify-frame {
+      width: 100%;
+      height: 152px;
+      border: none;
+      border-radius: 12px
+    }
+
+    /* extra content area (collapsible) */
+    #extraContent {
+      margin-top: 18px;
+      display: block;
+      height: 0;
+      overflow: hidden;
+      transition: height .45s, opacity .35s;
+      opacity: 0
+    }
+
+    #extraContent.open {
+      height: auto;
+      padding-top: 12px;
+      opacity: 1
+    }
+
+    .extra-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.02));
+      border-radius: 12px;
+      border: 2px solid rgba(255, 128, 171, .12);
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform .22s, box-shadow .22s
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 34px rgba(0, 0, 0, .35)
+    }
+
+    .card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block
+    }
+
+    .card .meta {
+      padding: 8px 10px;
+      font-size: .95rem;
+      color: #ffeef6
+    }
+
+    /* modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, .85);
+      z-index: 1100;
+      padding: 20px
+    }
+
+    .modal.open {
+      display: flex
+    }
+
+    .modal .inner {
+      max-width: 92vw;
+      max-height: 90vh;
+      border-radius: 12px;
+      overflow: hidden
+    }
+
+    .modal img {
+      display: block;
+      max-width: 100%;
+      max-height: 90vh
+    }
+
+    /* game */
+    #gamePanel {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .02));
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .18)
+    }
+
+    .game-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 520px;
+      margin: 0 auto
+    }
+
+    .tile {
+      background: linear-gradient(180deg, #ffeef7, #ffd6e8);
+      height: 84px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .18s
+    }
+
+    .tile.flipped {
+      background: linear-gradient(180deg, #fff, #ffe6f0);
+      transform: rotateY(0)
+    }
+
+    .tile.matched {
+      background: linear-gradient(180deg, #ffecf4, #ffdbe8);
+      cursor: default;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .12)
+    }
+
+    /* nav tabs - added visible contour/border & focus styles */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0;
+      flex-wrap: wrap
+    }
+
+    .tab {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 8px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 128, 171, 0.12);
+      transition: box-shadow .16s, transform .12s
+    }
+
+    .tab:hover {
+      box-shadow: 0 6px 18px rgba(255, 128, 171, 0.06);
+      transform: translateY(-2px)
+    }
+
+    .tab:focus {
+      outline: 3px solid rgba(255, 128, 171, 0.22);
+      outline-offset: 3px
+    }
+
+    .tab.active {
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      color: #fff
+    }
+
+    /* moodboard */
+    #moodBoard {
+      min-height: 220px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.06));
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: flex-start;
+      position: relative;
+      overflow: hidden
+    }
+
+    .sticker {
+      width: 96px;
+      height: 96px;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      touch-action: none;
+      cursor: grab;
+      flex: 0 0 auto
+    }
+
+    .sticker img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block
+    }
+
+    #boardCanvas {
+      flex: 1;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(0, 0, 0, 0.05));
+      min-height: 300px;
+      position: relative;
+      overflow: hidden
+    }
+
+    /* quiz */
+    #quizPanel {
+      padding: 12px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(0, 0, 0, 0.03))
+    }
+
+    .quiz-q {
+      font-weight: 700;
+      margin-bottom: 8px
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .option {
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.02)
+    }
+
+    /* badges & achievements */
+    #achievements {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .badge {
+      background: linear-gradient(90deg, #ffdce9, #ffe7f5);
+      color: #6b0234;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, .1)
+    }
+
+    /* control panel collapsed state */
+    #controlPanel {
+      transition: transform .28s ease, opacity .28s ease;
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      background: var(--control-bg);
+      backdrop-filter: blur(6px);
+      padding: 8px;
+      border-radius: 10px;
+      z-index: 10001;
+      min-width: 280px;
+      max-width: 85vw;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, .45);
+    }
+
+    #controlPanel.collapsed {
+      transform: translateX(calc(-100% + 44px));
+      opacity: 0.95
+    }
+
+    /* floating handle (always available) */
+    #panelToggleHandle {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 10002;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .35);
+    }
+
+    /* heart and confetti visual styles and animations */
+    .heart {
+      position: fixed;
+      width: var(--size, 18px);
+      height: var(--size, 18px);
+      pointer-events: none;
+      z-index: 10000;
+      background: var(--color, #ff6aa6);
+      transform: rotate(-45deg);
+      opacity: var(--opacity, 1);
+      animation: heart-rise var(--duration, 1.4s) cubic-bezier(.2, .9, .3, 1) forwards;
+      display: block;
+      left: 0;
+      top: 0;
+      border-radius: 4px;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: inherit;
+      border-radius: 50%;
+    }
+
+    .heart::before {
+      top: -50%;
+      left: 0;
+    }
+
+    .heart::after {
+      left: 50%;
+      top: 0;
+    }
+
+    @keyframes heart-rise {
+      0% {
+        transform: translateY(0) rotate(-45deg) scale(1);
+        opacity: var(--opacity, 1);
+      }
+
+      30% {
+        transform: translateY(-24px) rotate(-35deg) scale(1.05);
+      }
+
+      60% {
+        transform: translateY(-70px) rotate(-25deg) scale(1.02);
+        opacity: 0.9;
+      }
+
+      100% {
+        transform: translateY(-140px) translateX(var(--windX, 0px)) rotate(-25deg) scale(0.98);
+        opacity: 0;
+      }
+    }
+
+    .confetti {
+      position: fixed;
+      width: 8px;
+      height: 10px;
+      pointer-events: none;
+      z-index: 10000;
+      background: currentColor;
+      transform-origin: center;
+      animation: confetti-fall 1.4s linear forwards;
+      border-radius: 2px;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(0) rotate(0deg) scale(1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(-160px) translateX(var(--cx, 0px)) rotate(360deg) scale(0.9);
+        opacity: 0;
+      }
+    }
+
+    /* simple cursor & effects (kept minimal) */
+    .cursor {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: screen;
+      transform: translate(-50%, -50%);
+      transition: transform .12s
+    }
+
+    .cursor.big {
+      width: 52px;
+      height: 52px
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      background: rgba(255, 255, 255, 0.25);
+      pointer-events: none
+    }
+
+    @media(max-width:900px) {
+      .top {
+        flex-direction: column;
+        align-items: center
+      }
+
+      .photo {
+        width: 200px
+      }
+
+      .container {
+        padding: 16px
+      }
+    }
+
+    @media(max-width:560px) {
+      .game-board {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .tile {
+        height: 72px
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      * {
+        animation: none !important;
+        transition: none !important
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Floating toggle handle: always available even if control panel is collapsed or off-screen -->
+  <button id="panelToggleHandle" title="Mostrar / Esconder painel">☰</button>
+
+  <div id="bgMediaWrap" aria-hidden="true">
+    <video id="bgVideo" playsinline muted loop></video>
+    <iframe id="bgYouTube" allow="autoplay; fullscreen"
+      sandbox="allow-same-origin allow-scripts allow-presentation"></iframe>
+  </div>
+  <div id="bgOverlay"></div>
+
+  <!-- Control panel -->
+  <div id="controlPanel" aria-label="Painel de controle">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <div style="font-weight:700;font-size:.95rem">Painel de controle</div>
+    </div>
+    <label style="display:block;font-weight:700;margin-bottom:6px">🌞 Fundo Diurno</label>
+    <input id="dayBgInput" placeholder="URL da imagem, .mp4 ou link YouTube"
+      style="width:260px;padding:6px;border-radius:6px;border:none;margin-bottom:8px" />
+    <label style="display:block;font-weight:700;margin-bottom:6px">🌙 Fundo Noturno</label>
+    <input id="nightBgInput" placeholder="URL da imagem, .mp4 ou link YouTube"
+      style="width:260px;padding:6px;border-radius:6px;border:none;margin-bottom:8px" />
+    <label style="display:block;font-weight:700;margin-bottom:6px">🎧 Playlist Spotify</label>
+    <input id="spotifyInput" placeholder="Cole o link da playlist (open.spotify.com/playlist/...)"
+      style="width:260px;padding:6px;border-radius:6px;border:none;margin-bottom:8px" />
+    <button id="loadPlaylistBtn" class="btn" style="width:100%;margin-bottom:6px">▶️ Carregar Playlist</button>
+    <div style="display:flex;gap:6px">
+      <select id="decorationSelect" style="padding:6px;border-radius:6px;border:none">
+        <option value="hearts">Corações</option>
+        <option value="confetti">Confetti</option>
+        <option value="none">Nenhum</option>
+      </select>
+      <button id="resetBtn" class="btn" style="background:linear-gradient(135deg,#ff7676,#ffb199)">Resetar</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="container" role="main" id="mainContainer">
+      <div class="top">
+        <figure class="photo"><img id="mainPhoto" loading="lazy" src="https://i.imgur.com/oK3x5BH.jpeg"
+            alt="Nossa foto juntos" /></figure>
+        <div class="maincol">
+          <div class="message" id="message" aria-live="polite"></div>
+
+          <!-- Global controls (moved out of playlist) -->
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:6px">
+            <button id="moreBtn" class="btn" aria-expanded="false">💌 Ver Mais</button>
+            <button id="darkModeBtn" class="btn">🌙 Modo Noturno</button>
+          </div>
+
+          <div class="tabs" id="tabs">
+            <div class="tab active" data-panel="panel-playlist">Playlist</div>
+            <div class="tab" data-panel="panel-games">Jogos</div>
+            <div class="tab" data-panel="panel-quiz">Quiz do Amor</div>
+            <div class="tab" data-panel="panel-mood">Mood Board</div>
+            <div class="tab" data-panel="panel-more">Mais</div>
+          </div>
+
+          <div id="panel-playlist" class="panel">
+            <div class="controls">
+              <button id="playBtn" class="btn">▶️ Tocar Playlist</button>
+            </div>
+
+            <div class="spotify-box" id="spotifyBox" style="margin-top:12px">
+              <div id="spotifyPlaceholder" style="padding:18px;text-align:center;color:#ffeeff">Playlist não carregada
+              </div>
+            </div>
+          </div>
+
+          <div id="panel-games" class="panel" hidden>
+            <div id="gamePanel" aria-hidden="true" style="display:block">
+              <div class="game-header">
+                <div style="font-weight:700">Cupid's Match — Jogo da Memória</div>
+                <div class="small" id="gameInfo">Acertos: 0 | Tentativas: 0</div>
+              </div>
+              <div class="game-board" id="gameBoard" aria-live="polite"></div>
+              <div style="text-align:center;margin-top:10px"><button id="restartGame" class="btn">🔁 Reiniciar</button>
+              </div>
+            </div>
+            <div style="margin-top:12px">
+              <button id="startTicTac" class="btn">❌⭕️ Jogo da Velha (2 players)</button>
+              <div id="ticTacToe"
+                style="display:none;margin-top:10px;background:rgba(255,255,255,0.02);padding:10px;border-radius:8px">
+                <div id="tttBoard" style="display:grid;grid-template-columns:repeat(3,70px);gap:6px"></div>
+                <div style="margin-top:8px"><button id="resetTtt" class="btn">Resetar</button></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="panel-quiz" class="panel" hidden>
+            <div id="quizPanel">
+              <div class="quiz-q" id="quizQuestion">Carregando quiz...</div>
+              <div class="quiz-options" id="quizOptions"></div>
+              <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+                <button id="nextQ" class="btn" style="display:none">Próxima</button>
+                <div id="quizScore" class="small">Pontuação: 0</div>
+                <div id="quizResult" class="small" style="margin-left:10px;display:none"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="panel-mood" class="panel" hidden>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <div style="width:120px">
+                <div style="font-weight:700;margin-bottom:6px">Adicione stickers</div>
+                <div id="moodStickers" style="display:flex;flex-direction:column;gap:8px">
+                  <!-- stickers injected -->
+                </div>
+                <div style="margin-top:8px">
+                  <input id="uploadImage" type="file" accept="image/*" style="display:block" />
+                </div>
+              </div>
+              <div id="boardCanvas" style="flex:1">
+                <div id="moodBoard" style="height:360px;padding:12px"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="panel-more" class="panel" hidden>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="font-weight:700">Conquistas</div>
+              <div id="achievements"><!-- persisted badges will be injected --></div>
+              <div style="margin-top:8px">
+                <button id="shareBtn" class="btn">📤 Compartilhar</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="extraContent" aria-hidden="true">
+        <div class="extra-grid" id="extraGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="inner"><img id="modalImg" src="" alt="Imagem ampliada"></div>
+  </div>
+
+  <div id="cursor" class="cursor" aria-hidden="true">
+    <div class="trail"></div>
+    <div class="core"></div>
+  </div>
+
+  <script>
+    /* Fixes implemented:
+       - stickers: click-to-add + drag/drop support, board is position:relative so absolute stickers work; dropped/added nodes are made draggable
+       - achievements: persisted in localStorage (ACHIEVEMENTS), rendered on load and saved on addAchievement
+       - quiz: shows final result when last question answered, displays final message and awards achievement
+       - panel toggle handle ensures panel reachable when collapsed
+    */
+
+    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Typing message */
+    const messageEl = document.getElementById('message');
+    const text = "AMOOR DA MINHA VIDA, MINHA GATINHAA 💫";
+    (function typewriter() { let i = 0; function step() { if (i < text.length) { if (messageEl) messageEl.textContent += text.charAt(i++); setTimeout(step, 70); } } step(); })();
+
+    /* Defaults */
+    const DEFAULT_SPOTIFY_URL = 'https://open.spotify.com/playlist/3AlzaL3fuUAtulQFklJy8v?si=_5BzUq0CQ_WDlL31eLaUcg';
+
+    /* --- Achievements persistence --- */
+    function loadAchievements() {
+      try {
+        const raw = localStorage.getItem('ACHIEVEMENTS');
+        const arr = raw ? JSON.parse(raw) : [];
+        const holder = document.getElementById('achievements');
+        if (!holder) return;
+        holder.innerHTML = '';
+        arr.forEach(name => {
+          const s = document.createElement('span'); s.className = 'badge'; s.textContent = name;
+          holder.appendChild(s);
+        });
+      } catch (e) { console.error('loadAchievements', e); }
+    }
+    function persistAchievements(list) {
+      try { localStorage.setItem('ACHIEVEMENTS', JSON.stringify(list)); } catch (e) { }
+    }
+    function addAchievement(name) {
+      try {
+        const holder = document.getElementById('achievements');
+        if (!holder) return;
+        // avoid duplicates in UI and storage
+        const exists = Array.from(holder.children).some(b => b.textContent === name);
+        if (exists) return;
+        const span = document.createElement('span'); span.className = 'badge'; span.textContent = name;
+        holder.appendChild(span);
+        // persist
+        let cur = [];
+        try { cur = JSON.parse(localStorage.getItem('ACHIEVEMENTS') || '[]'); } catch (e) { cur = []; }
+        if (!cur.includes(name)) { cur.push(name); persistAchievements(cur); }
+        // transient highlight
+        setTimeout(() => span.classList.add('fade'), 3500);
+      } catch (e) { console.error('addAchievement error', e); }
+    }
+
+    /* YouTube helpers */
+    function parseYouTubeUrl(url) {
+      if (!url) return null;
+      try {
+        const u = new URL(url, location.href);
+        const hostname = u.hostname.replace('www.', '');
+        if (hostname === 'youtu.be') {
+          const vid = u.pathname.slice(1).split('/')[0];
+          if (vid) return { type: 'video', id: vid };
+        }
+        if (hostname.includes('youtube.com') || hostname.includes('youtube-nocookie.com')) {
+          if (u.pathname.startsWith('/playlist') && u.searchParams.get('list')) return { type: 'playlist', id: u.searchParams.get('list') };
+          if (u.searchParams.get('v')) {
+            const vid = u.searchParams.get('v'); const list = u.searchParams.get('list');
+            if (list) return { type: 'playlist', id: list };
+            return { type: 'video', id: vid };
+          }
+          const parts = u.pathname.split('/');
+          const shortsIdx = parts.indexOf('shorts');
+          if (shortsIdx >= 0 && parts[shortsIdx + 1]) return { type: 'video', id: parts[shortsIdx + 1] };
+          if (u.pathname.startsWith('/embed/')) return { type: 'video', id: u.pathname.split('/embed/')[1].split('/')[0] };
+        }
+        if (u.searchParams.get('list')) return { type: 'playlist', id: u.searchParams.get('list') };
+      } catch (e) { /* ignore */ }
+      return null;
+    }
+    function isVideoUrl(url) { return url && url.split('?')[0].toLowerCase().endsWith('.mp4'); }
+
+    /* INIT */
+    window.addEventListener('load', () => {
+      setTimeout(() => document.body.classList.add('loaded'), 180);
+
+      // decoration select
+      const savedDec = (function () { try { return localStorage.getItem('decoration') || 'hearts' } catch (e) { return 'hearts' } })();
+      const decSelect = document.getElementById('decorationSelect');
+      if (decSelect) decSelect.value = savedDec;
+      applyDecoration(savedDec);
+
+      // spotify
+      const sp = (function () { try { return localStorage.getItem('SPOTIFY_URL') } catch (e) { return null } })();
+      if (sp) { const sIn = document.getElementById('spotifyInput'); if (sIn) sIn.value = sp; injectSpotifyIframe(sp, false); }
+      else { const sIn = document.getElementById('spotifyInput'); if (sIn) sIn.value = DEFAULT_SPOTIFY_URL; try { localStorage.setItem('SPOTIFY_URL', DEFAULT_SPOTIFY_URL) } catch (e) { }; injectSpotifyIframe(DEFAULT_SPOTIFY_URL, false); }
+
+      // backgrounds
+      const day = (function () { try { return localStorage.getItem('DAY_BG') } catch (e) { return null } })();
+      const night = (function () { try { return localStorage.getItem('NIGHT_BG') } catch (e) { return null } })();
+      if (day) { const di = document.getElementById('dayBgInput'); if (di) di.value = day; }
+      if (night) { const ni = document.getElementById('nightBgInput'); if (ni) ni.value = night; }
+
+      populateGallery();
+
+      try { if (localStorage.getItem && localStorage.getItem('CONTROL_PANEL_COLLAPSED') === '1') document.getElementById('controlPanel').classList.add('collapsed'); } catch (e) { }
+
+      addCursorHoverListeners();
+      bindInteractiveEffects();
+      bindTabs();
+      initQuiz();
+      populateStickers();
+      initTicTacToe();
+
+      loadAchievements(); // render persisted achievements
+    });
+
+    /* Cursor */
+    const cursor = document.getElementById('cursor');
+    let targetX = window.innerWidth / 2, targetY = window.innerHeight / 2;
+    let currentX = targetX, currentY = targetY, cursorTicking = false;
+    let lastPointerTime = 0;
+    document.addEventListener('pointermove', (e) => {
+      targetX = e.clientX; targetY = e.clientY;
+      lastPointerTime = performance.now();
+      if (!cursorTicking) { cursorTicking = true; requestAnimationFrame(cursorFrame); }
+    }, { passive: true });
+    function cursorFrame() {
+      const lerp = prefersReduced ? 1 : 0.22;
+      currentX += (targetX - currentX) * lerp;
+      currentY += (targetY - currentY) * lerp;
+      if (cursor) { cursor.style.left = currentX + 'px'; cursor.style.top = currentY + 'px'; }
+      if (Math.abs(targetX - currentX) < 0.5 && Math.abs(targetY - currentY) < 0.5) cursorTicking = false;
+      else requestAnimationFrame(cursorFrame);
+    }
+    function addCursorHoverListeners() {
+      document.querySelectorAll('button, a, .card, .tile, input, select, .photo img').forEach(el => {
+        el.addEventListener('pointerenter', () => cursor && cursor.classList.add('big'));
+        el.addEventListener('pointerleave', () => cursor && cursor.classList.remove('big'));
+      });
+    }
+
+    /* Decorations (throttled & capped) */
+    const DECOR_CAP = 60;
+    const BURST_THROTTLE_MS = 160;
+    let lastBurst = 0;
+    function countDecorNodes() { return document.querySelectorAll('.heart, .confetti').length; }
+
+    function safeClickBurst(x, y, kind = 'hearts') {
+      if (prefersReduced) return;
+      const now = performance.now();
+      if (now - lastBurst < BURST_THROTTLE_MS) return;
+      lastBurst = now;
+      if (countDecorNodes() >= DECOR_CAP) return;
+      const maxPerClick = 6;
+      const n = Math.min(maxPerClick, Math.floor(3 + Math.random() * 3));
+      for (let i = 0; i < n; i++) {
+        try {
+          if (kind === 'confetti') {
+            const c = document.createElement('div'); c.className = 'confetti';
+            const w = Math.floor(Math.random() * 8) + 6;
+            c.style.width = w + 'px'; c.style.height = (w * (Math.random() * 0.6 + 0.6)) + 'px';
+            c.style.left = (x + (Math.random() * 40 - 20)) + 'px'; c.style.top = (y + (Math.random() * 24 - 12)) + 'px';
+            c.style.background = `hsl(${Math.floor(Math.random() * 360)} 90% 65%)`; c.style.position = 'fixed'; c.style.zIndex = 10000;
+            c.style.setProperty('--cx', (Math.random() * 120 - 60) + 'px');
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 1600);
+          } else {
+            const h = document.createElement('div'); h.className = 'heart';
+            const size = Math.floor(Math.random() * 10) + 10;
+            h.style.setProperty('--size', size + 'px');
+            h.style.setProperty('--duration', (0.9 + Math.random() * 1.6) + 's');
+            h.style.setProperty('--opacity', (0.6 + Math.random() * 0.35));
+            h.style.setProperty('--windX', (Math.random() * 160 - 80) + 'px');
+            h.style.setProperty('--color', `hsl(${320 + Math.floor(Math.random() * 40)} 85% 65%)`);
+            h.style.left = (x + (Math.random() * 40 - 20)) + 'px'; h.style.top = (y + (Math.random() * 24 - 12)) + 'px';
+            h.style.position = 'fixed'; h.style.zIndex = 10000;
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), 2000);
+          }
+        } catch (ex) { console.error('safeClickBurst error', ex); }
+      }
+    }
+
+    let decInterval = null;
+    function createHeartBackground() {
+      if (prefersReduced) return;
+      if (countDecorNodes() >= DECOR_CAP) return;
+      const h = document.createElement('div'); h.className = 'heart';
+      const size = Math.floor(Math.random() * 18) + 12; const left = Math.random() * 100; const duration = (Math.random() * 4) + 5;
+      const opacity = 0.6 + Math.random() * 0.35; const wind = (Math.random() * 160 - 80) + 'px'; const hue = 320 + Math.floor(Math.random() * 40);
+      h.style.setProperty('--size', size + 'px'); h.style.setProperty('--duration', duration + 's'); h.style.setProperty('--opacity', opacity);
+      h.style.setProperty('--windX', wind); h.style.setProperty('--color', `hsl(${hue} 85% 65%)`); h.style.left = left + 'vw'; h.style.setProperty('--delay', (Math.random() * 0.45) + 's');
+      // place at bottom
+      h.style.bottom = '-20px'; h.style.top = 'auto';
+      document.body.appendChild(h);
+      setTimeout(() => { try { h.remove(); } catch (e) { } }, (duration * 1000) + 8000);
+    }
+
+    function createConfettiBurst() {
+      if (prefersReduced) return;
+      const burst = Math.floor(6 + Math.random() * 10);
+      for (let i = 0; i < burst; i++) {
+        if (countDecorNodes() >= DECOR_CAP) break;
+        const c = document.createElement('div'); c.className = 'confetti';
+        const w = Math.floor(Math.random() * 8) + 6;
+        c.style.width = w + 'px'; c.style.height = (w * (Math.random() * 0.6 + 0.6)) + 'px'; c.style.position = 'fixed';
+        c.style.left = (Math.random() * 100) + 'vw'; c.style.top = (window.innerHeight - 40) + 'px';
+        c.style.background = `hsl(${Math.floor(Math.random() * 360)} 90% 65%)`; c.style.zIndex = 9998; document.body.appendChild(c);
+        c.style.setProperty('--cx', (Math.random() * 200 - 100) + 'px');
+        setTimeout(() => c.remove(), 1600);
+      }
+    }
+
+    function applyDecoration(name) {
+      clearInterval(decInterval);
+      document.querySelectorAll('.heart, .confetti').forEach(n => n.remove());
+      if (name === 'hearts') decInterval = setInterval(() => createHeartBackground(), 900);
+      else if (name === 'confetti') decInterval = setInterval(() => createConfettiBurst(), 1400);
+      else decInterval = null;
+      try { localStorage.setItem('decoration', name); } catch (e) { }
+    }
+
+    /* Ripple */
+    function createRipple(ev, el) {
+      try {
+        const rect = el.getBoundingClientRect();
+        const r = document.createElement('span'); r.className = 'ripple';
+        const size = Math.max(rect.width, rect.height) * 1.4;
+        r.style.width = r.style.height = size + 'px';
+        r.style.left = (ev.clientX - rect.left - size / 2) + 'px'; r.style.top = (ev.clientY - rect.top - size / 2) + 'px';
+        r.style.opacity = '0.9'; el.appendChild(r);
+        requestAnimationFrame(() => { r.style.transform = 'scale(1)'; r.style.opacity = '0'; r.style.transition = 'transform .6s cubic-bezier(.2,.9,.3,1), opacity .6s'; });
+        setTimeout(() => r.remove(), 700);
+      } catch (e) { }
+    }
+
+    function bindInteractiveEffects() {
+      document.querySelectorAll('button, .card, .tile, .photo img').forEach(el => {
+        el.removeEventListener('pointerdown', interactivePointerDown);
+        el.addEventListener('pointerdown', interactivePointerDown, { passive: true });
+      });
+    }
+    function interactivePointerDown(ev) {
+      if (ev.button !== 0) return;
+      const el = ev.currentTarget;
+      try { createRipple(ev, el); } catch (e) { }
+      const dec = (function () { try { return localStorage.getItem('decoration') || 'hearts' } catch (e) { return 'hearts' } })();
+      safeClickBurst(ev.clientX, ev.clientY, dec === 'confetti' ? 'confetti' : 'hearts');
+    }
+
+    /* Modal gallery */
+    const modal = document.getElementById('modal'), modalImg = document.getElementById('modalImg');
+    function openModal(src, alt) { if (!modal || !modalImg) return; modalImg.src = src; modalImg.alt = alt || 'Imagem'; modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
+    function closeModal() { if (!modal || !modalImg) return; modal.classList.remove('open'); modalImg.src = ''; modal.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
+    modal && modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeModal(); });
+
+    /* Gallery */
+    const galleryItems = [
+      { src: 'https://i.imgur.com/kUJiuhm.jpeg'},
+      { src: 'https://i.imgur.com/PPq9KND.jpeg'},
+      { src: 'https://i.imgur.com/OawRcMt.jpeg'},
+      { src: 'https://i.imgur.com/n4b9m73.jpeg'}
+    ];
+    function populateGallery() {
+      const grid = document.getElementById('extraGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      galleryItems.forEach(it => {
+        const card = document.createElement('div'); card.className = 'card';
+        card.innerHTML = `<img src="${it.src}" alt="${it.alt}" loading="lazy"><div class="meta">${it.alt}</div>`;
+        card.addEventListener('click', (ev) => { openModal(it.src, it.alt); createRipple(ev, card); });
+        grid.appendChild(card);
+      });
+      addCursorHoverListeners();
+      bindInteractiveEffects();
+    }
+
+    /* Spotify */
+    const spotifyInput = document.getElementById('spotifyInput');
+    const loadPlaylistBtn = document.getElementById('loadPlaylistBtn');
+    const spotifyBox = document.getElementById('spotifyBox');
+
+    function normalizeSpotifyUrl(raw) {
+      if (!raw) return '';
+      try {
+        raw = raw.trim();
+        if (raw.includes('open.spotify.com')) {
+          const u = new URL(raw.startsWith('http') ? raw : 'https://' + raw);
+          const parts = u.pathname.split('/');
+          const idx = parts.indexOf('playlist');
+          if (idx >= 0 && parts[idx + 1]) return 'https://open.spotify.com/embed/playlist/' + parts[idx + 1] + '?utm_source=generator';
+        }
+        if (/^[0-9A-Za-z]{20,}$/.test(raw)) return 'https://open.spotify.com/embed/playlist/' + raw + '?utm_source=generator';
+      } catch (e) { }
+      return '';
+    }
+
+    function injectSpotifyIframe(raw, focus = true) {
+      const url = normalizeSpotifyUrl(raw);
+      if (!spotifyBox) return;
+      spotifyBox.innerHTML = '';
+      if (!url) { spotifyBox.innerHTML = '<div id="spotifyPlaceholder" style="padding:18px;text-align:center;color:#ffeeff">URL inválida. Cole um link de playlist do Spotify.</div>'; return; }
+      const ifr = document.createElement('iframe');
+      ifr.className = 'spotify-frame';
+      ifr.title = 'Playlist do Spotify';
+      ifr.loading = 'lazy';
+      ifr.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen';
+      ifr.src = url;
+      spotifyBox.appendChild(ifr);
+      if (focus) try { ifr.focus && ifr.focus(); } catch (e) { }
+      try { localStorage.setItem('SPOTIFY_URL', raw); } catch (e) { }
+    }
+
+    loadPlaylistBtn && loadPlaylistBtn.addEventListener('click', (ev) => {
+      const raw = (spotifyInput && spotifyInput.value || '').trim();
+      injectSpotifyIframe(raw, true);
+      createRipple(ev, loadPlaylistBtn);
+    });
+
+    const playBtn = document.getElementById('playBtn');
+    playBtn && playBtn.addEventListener('click', () => {
+      const iframe = spotifyBox && spotifyBox.querySelector('iframe');
+      if (iframe) { iframe.focus && iframe.focus(); playBtn.textContent = '▶️ Tocando (se suportado)'; setTimeout(() => playBtn.textContent = '▶️ Tocar Playlist', 1100); }
+      else injectSpotifyIframe(spotifyInput && spotifyInput.value, true);
+      addAchievement('Primeiro Play');
+    });
+
+    /* Backgrounds & dark mode */
+    const darkBtn = document.getElementById('darkModeBtn');
+    let dark = false;
+    let DAY_BG = (function () { try { return localStorage.getItem('DAY_BG') || 'https://i.imgur.com/0JMLcYr.jpeg' } catch (e) { return 'https://i.imgur.com/0JMLcYr.jpeg' } })();
+    let NIGHT_BG = (function () { try { return localStorage.getItem('NIGHT_BG') || 'https://i.imgur.com/rJePXtj.jpeg' } catch (e) { return 'https://i.imgur.com/rJePXtj.jpeg' } })();
+    const dayInput = document.getElementById('dayBgInput'), nightInput = document.getElementById('nightBgInput');
+    const bgVideo = document.getElementById('bgVideo'), bgYouTube = document.getElementById('bgYouTube');
+
+    if (localStorage.getItem && localStorage.getItem('darkMode') === '1') { dark = true; document.body.classList.add('dark'); darkBtn && (darkBtn.textContent = '☀️ Modo Claro'); }
+    if (dayInput) dayInput.value = DAY_BG; if (nightInput) nightInput.value = NIGHT_BG;
+
+    function setBackground(url, opts = { forceImage: false }) {
+      if (!url) return;
+      const yt = parseYouTubeUrl(url);
+      if (yt && !opts.forceImage) {
+        if (yt.type === 'video') {
+          const vid = yt.id;
+          const embed = `https://www.youtube.com/embed/${vid}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${vid}&enablejsapi=1`;
+          bgYouTube && (bgYouTube.src = embed); bgYouTube && (bgYouTube.style.opacity = '1'); adjustYouTubeSizing();
+          if (bgVideo) { bgVideo.pause(); bgVideo.removeAttribute('src'); bgVideo.style.opacity = '0'; }
+          document.body.style.backgroundImage = '';
+          return;
+        } else if (yt.type === 'playlist') {
+          const listId = yt.id;
+          const embed = `https://www.youtube.com/embed?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&enablejsapi=1&listType=playlist&list=${listId}`;
+          bgYouTube && (bgYouTube.src = embed); bgYouTube && (bgYouTube.style.opacity = '1'); adjustYouTubeSizing();
+          if (bgVideo) { bgVideo.pause(); bgVideo.removeAttribute('src'); bgVideo.style.opacity = '0'; }
+          document.body.style.backgroundImage = '';
+          return;
+        }
+      }
+      if (isVideoUrl(url) && !opts.forceImage) {
+        bgYouTube && bgYouTube.removeAttribute('src'); bgYouTube && (bgYouTube.style.opacity = '0');
+        try { if (bgVideo) { bgVideo.src = url; bgVideo.load(); bgVideo.play().catch(() => { }); } } catch (e) { }
+        bgVideo && (bgVideo.style.opacity = '1');
+        document.body.style.backgroundImage = '';
+        return;
+      }
+      bgYouTube && bgYouTube.removeAttribute('src'); bgYouTube && (bgYouTube.style.opacity = '0');
+      if (bgVideo) { bgVideo.pause(); bgVideo.removeAttribute('src'); bgVideo.style.opacity = '0'; }
+      document.body.style.backgroundImage = `url('${url}')`;
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundPosition = 'center';
+    }
+
+    function applyCurrentBg() { if (dark && NIGHT_BG) setBackground(NIGHT_BG); else if (!dark && DAY_BG) setBackground(DAY_BG); }
+    applyCurrentBg();
+
+    darkBtn && darkBtn.addEventListener('click', () => {
+      dark = !dark;
+      document.body.classList.toggle('dark', dark);
+      darkBtn.textContent = dark ? '☀️ Modo Claro' : '🌙 Modo Noturno';
+      try { localStorage.setItem('darkMode', dark ? '1' : '0'); } catch (e) { }
+      applyCurrentBg();
+    });
+
+    function safeUrl(s) { try { const u = new URL(s, location.href); return u.href; } catch (e) { return (s || '').trim(); } }
+    dayInput && dayInput.addEventListener('change', () => { const v = safeUrl(dayInput.value); if (v) { DAY_BG = v; try { localStorage.setItem('DAY_BG', DAY_BG) } catch (e) { }; if (!dark) setBackground(DAY_BG); } });
+    nightInput && nightInput.addEventListener('change', () => { const v = safeUrl(nightInput.value); if (v) { NIGHT_BG = v; try { localStorage.setItem('NIGHT_BG', NIGHT_BG) } catch (e) { }; if (dark) setBackground(NIGHT_BG); } });
+
+    function adjustYouTubeSizing() {
+      if (!bgYouTube) return;
+      const vw = window.innerWidth, vh = window.innerHeight, aspect = 16 / 9;
+      if (vw / vh < aspect) { bgYouTube.style.height = `${vh}px`; bgYouTube.style.width = `${vh * aspect}px`; }
+      else { bgYouTube.style.width = `${vw}px`; bgYouTube.style.height = `${vw / aspect}px`; }
+    }
+    window.addEventListener('resize', adjustYouTubeSizing);
+
+    /* Reset */
+    document.getElementById('resetBtn') && document.getElementById('resetBtn').addEventListener('click', (ev) => {
+      try { localStorage.removeItem('DAY_BG'); localStorage.removeItem('NIGHT_BG'); localStorage.removeItem('SPOTIFY_URL'); localStorage.removeItem('decoration'); localStorage.removeItem('darkMode'); localStorage.removeItem('CONTROL_PANEL_COLLAPSED'); } catch (e) { }
+      DAY_BG = 'https://i.imgur.com/0JMLcYr.jpeg'; NIGHT_BG = 'https://i.imgur.com/rJePXtj.jpeg';
+      const sIn = document.getElementById('spotifyInput'); if (sIn) sIn.value = DEFAULT_SPOTIFY_URL; injectSpotifyIframe(DEFAULT_SPOTIFY_URL, false);
+      const decEl = document.getElementById('decorationSelect'); if (decEl) decEl.value = 'hearts'; applyDecoration('hearts');
+      const di = document.getElementById('dayBgInput'); const ni = document.getElementById('nightBgInput'); if (di) di.value = DAY_BG; if (ni) ni.value = NIGHT_BG;
+      document.body.classList.remove('dark'); dark = false; darkBtn && (darkBtn.textContent = '🌙 Modo Noturno');
+      applyCurrentBg();
+      safeClickBurst(window.innerWidth / 2, window.innerHeight / 2, 'confetti');
+      createRipple(ev, document.getElementById('resetBtn'));
+    });
+
+    /* Mini-game: memory */
+    const openGameBtn = document.getElementById('openGameBtn');
+    const gamePanel = document.getElementById('gamePanel');
+    const gameBoard = document.getElementById('gameBoard');
+    const restartGame = document.getElementById('restartGame');
+    const gameInfo = document.getElementById('gameInfo');
+    let tiles = [], firstPick = null, secondPick = null, lockBoard = false, matches = 0, attempts = 0;
+    const symbols = ['💖', '🌹', '🌟', '🍫', '🎵', '🎁', '🍓', '🕊️'];
+
+    function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[array[i], array[j]] = [array[j], array[i]]; } return array; }
+    function initGame() {
+      tiles = []; firstPick = secondPick = null; lockBoard = false; matches = 0; attempts = 0;
+      if (gameInfo) gameInfo.textContent = `Acertos: ${matches} | Tentativas: ${attempts}`;
+      const needed = 8; const pool = symbols.slice(0, needed); const doubled = pool.concat(pool); const shuffled = shuffle(doubled);
+      if (!gameBoard) return;
+      gameBoard.innerHTML = '';
+      shuffled.forEach((s, idx) => {
+        const t = document.createElement('div'); t.className = 'tile'; t.tabIndex = 0;
+        t.setAttribute('data-symbol', s); t.setAttribute('role', 'button'); t.setAttribute('aria-label', 'Carta do jogo');
+        t.textContent = ''; t.addEventListener('click', onTileClick);
+        t.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTileClick({ currentTarget: t }); } });
+        gameBoard.appendChild(t);
+      });
+      addCursorHoverListeners();
+      bindInteractiveEffects();
+    }
+
+    function onTileClick(e) {
+      if (lockBoard) return;
+      const t = e.currentTarget;
+      if (!t || t.classList.contains('flipped') || t.classList.contains('matched')) return;
+      t.classList.add('flipped'); t.textContent = t.getAttribute('data-symbol');
+      if (!firstPick) { firstPick = t; return; }
+      secondPick = t; lockBoard = true; attempts++;
+      if (firstPick.getAttribute('data-symbol') === secondPick.getAttribute('data-symbol')) {
+        firstPick.classList.add('matched'); secondPick.classList.add('matched'); matches++;
+        setTimeout(() => {
+          resetPicks(); lockBoard = false; if (gameInfo) gameInfo.textContent = `Acertos: ${matches} | Tentativas: ${attempts}`;
+          if (matches === 8) { setTimeout(() => safeClickBurst(window.innerWidth / 2, window.innerHeight / 2, 'confetti'), 300); addAchievement('Memória completa'); }
+        }, 300);
+      } else {
+        setTimeout(() => {
+          if (firstPick) { firstPick.classList.remove('flipped'); firstPick.textContent = ''; }
+          if (secondPick) { secondPick.classList.remove('flipped'); secondPick.textContent = ''; }
+          resetPicks(); lockBoard = false; if (gameInfo) gameInfo.textContent = `Acertos: ${matches} | Tentativas: ${attempts}`;
+        }, 700);
+      }
+    }
+    function resetPicks() { firstPick = null; secondPick = null; }
+
+    if (openGameBtn) {
+      openGameBtn.addEventListener('click', (ev) => {
+        const visible = gamePanel && gamePanel.style.display !== 'none';
+        if (gamePanel) gamePanel.style.display = visible ? 'none' : 'block';
+        if (gamePanel) gamePanel.setAttribute('aria-hidden', visible ? 'true' : 'false');
+        if (!visible) initGame();
+        createRipple(ev, openGameBtn);
+      });
+    }
+    restartGame && restartGame.addEventListener('click', (ev) => { initGame(); createRipple(ev, restartGame); });
+
+    /* Tabs */
+    function bindTabs() {
+      const tabs = document.getElementById('tabs');
+      if (!tabs) return;
+      tabs.addEventListener('click', (ev) => {
+        const t = ev.target.closest('.tab');
+        if (!t) return;
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        document.querySelectorAll('.panel').forEach(p => p.hidden = true);
+        const panelId = t.getAttribute('data-panel');
+        const panel = document.getElementById(panelId);
+        if (panel) panel.hidden = false;
+        if (panelId === 'panel-games') initGame();
+      });
+    }
+
+    /* Panel toggle (floating handle + storage) */
+    (function bindPanelToggle() {
+      try {
+        const panelToggle = document.getElementById('panelToggleHandle');
+        if (!panelToggle) return;
+        panelToggle.addEventListener('click', () => {
+          const cp = document.getElementById('controlPanel');
+          if (!cp) return;
+          const collapsed = cp.classList.toggle('collapsed');
+          try { localStorage.setItem('CONTROL_PANEL_COLLAPSED', collapsed ? '1' : '0'); } catch (e) { }
+          panelToggle.focus();
+        });
+      } catch (e) { console.error('panelToggle bind error', e); }
+    })();
+
+    document.getElementById('decorationSelect') && document.getElementById('decorationSelect').addEventListener('change', (e) => applyDecoration(e.target.value));
+
+    /* "Ver Mais" expand */
+    (function bindMoreButton() {
+      const moreBtn = document.getElementById('moreBtn');
+      const extraContent = document.getElementById('extraContent');
+      if (!moreBtn || !extraContent) return;
+      moreBtn.addEventListener('click', () => {
+        const isOpen = extraContent.classList.contains('open');
+        if (isOpen) {
+          const startHeight = extraContent.scrollHeight;
+          extraContent.style.height = startHeight + 'px';
+          void extraContent.offsetHeight;
+          extraContent.style.transition = 'height .36s, opacity .3s';
+          extraContent.style.height = '0px';
+          extraContent.classList.remove('open');
+          extraContent.setAttribute('aria-hidden', 'true');
+          moreBtn.setAttribute('aria-expanded', 'false');
+          moreBtn.textContent = '💌 Ver Mais';
+          setTimeout(() => { extraContent.style.height = ''; extraContent.style.transition = ''; }, 360);
+        } else {
+          extraContent.classList.add('open'); extraContent.setAttribute('aria-hidden', 'false');
+          moreBtn.setAttribute('aria-expanded', 'true'); moreBtn.textContent = '🔽 Ver Menos';
+          const targetHeight = extraContent.scrollHeight;
+          extraContent.style.height = '0px';
+          void extraContent.offsetHeight;
+          extraContent.style.transition = 'height .36s, opacity .3s';
+          extraContent.style.height = targetHeight + 'px';
+          setTimeout(() => { extraContent.style.height = ''; extraContent.style.transition = ''; }, 380);
+        }
+      });
+    })();
+
+    /* Modal photo click */
+    document.getElementById('mainPhoto') && document.getElementById('mainPhoto').addEventListener('click', (ev) => { openModal(ev.currentTarget.src, ev.currentTarget.alt); createRipple(ev, ev.currentTarget); });
+
+    /* --- Quiz: show final result and award achievement --- */
+    const quizData = [
+      { q: 'Onde nos conhecemos?', a: ['Na escola', 'No trabalho', 'Por amigos', 'Online', 'Basquete'], correct: 4 },
+      { q: 'Qual é meu nome?', a: ['Matheus', 'Ice', 'AMOR DA MINHA VIDA, MEU DONO, MEU HOMEM', 'AMOR DA MINHA VIDA'], correct: 2 },
+      { q: 'Melhor programa juntos?', a: ['Cinema', 'Pôr do sol', 'Viagem', 'Jantar caseiro', '🤭😈🔞', 'TODOS'], correct: 5 },
+      { q: 'Meu carinho favorito?', a: ['Nas costas', 'Pezinhos No rosto', 'Cafuné', 'Na barriga', 'No pescoço'], correct: 1 },
+      { q: 'Qual minha forma favorita de pontuar?', a: ['Bandeja', 'Uma dunk', 'Uma sexta de 3 pontos', 'Uma jogada 1 contra 1'], correct: 3 },
+
+      // 👇 nessas duas últimas, todas as respostas estão corretas:
+      { q: 'Quem faz mais carinho?', a: ['Matheus', 'Ice', 'Você meu amor', 'Claro que não é eu'], correct: [0, 1, 2, 3] },
+      { q: 'Quem Dorme mais?', a: ['Bruna', 'Bruninha', 'EU MEU AMOR DUUR', 'Claro que é eu'], correct: [0, 1, 2, 3] }
+    ];
+
+    let quizIndex = 0, quizScore = 0;
+
+    function initQuiz() {
+      quizIndex = 0; quizScore = 0;
+      renderQuiz();
+      const scoreEl = document.getElementById('quizScore');
+      if (scoreEl) scoreEl.textContent = `Pontuação: ${quizScore}`;
+      const resultEl = document.getElementById('quizResult');
+      if (resultEl) resultEl.style.display = 'none';
+    }
+
+    function renderQuiz() {
+      const qEl = document.getElementById('quizQuestion');
+      const opts = document.getElementById('quizOptions');
+      const nextBtn = document.getElementById('nextQ');
+      const scoreEl = document.getElementById('quizScore');
+      const resultEl = document.getElementById('quizResult');
+
+      if (!qEl || !opts) return;
+      const item = quizData[quizIndex];
+      if (!item) return;
+
+      qEl.textContent = item.q;
+      opts.innerHTML = '';
+
+      item.a.forEach((opt, i) => {
+        const d = document.createElement('div');
+        d.className = 'option';
+        d.tabIndex = 0;
+        d.textContent = opt;
+
+        d.addEventListener('click', () => {
+          if (d.dataset.answered) return;
+          d.dataset.answered = '1';
+
+          // ✅ verifica se é um índice ou um array de índices corretos
+          const correctAnswers = Array.isArray(item.correct) ? item.correct : [item.correct];
+          const isCorrect = correctAnswers.includes(i);
+
+          if (isCorrect) {
+            quizScore++;
+            d.style.background = 'linear-gradient(90deg,#bff2d6,#c7ffe8)';
+            addAchievement('Quiz acertou');
+          } else {
+            d.style.background = 'linear-gradient(90deg,#ffd6d6,#ffe6e6)';
+          }
+
+          Array.from(opts.children).forEach(c => c.style.pointerEvents = 'none');
+          if (scoreEl) scoreEl.textContent = `Pontuação: ${quizScore}`;
+
+          if (quizIndex >= quizData.length - 1) {
+            if (resultEl) {
+              resultEl.style.display = 'inline-block';
+              resultEl.textContent = `Quiz finalizado! Pontuação: ${quizScore} / ${quizData.length}`;
+            }
+            addAchievement('Quiz concluído');
+            if (nextBtn) nextBtn.style.display = 'none';
+          } else {
+            if (nextBtn) nextBtn.style.display = 'inline-flex';
+          }
+        });
+
+        d.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); d.click(); }
+        });
+
+        opts.appendChild(d);
+      });
+
+      if (nextBtn) nextBtn.onclick = () => {
+        quizIndex = Math.min(quizData.length - 1, quizIndex + 1);
+        if (nextBtn) nextBtn.style.display = 'none';
+        renderQuiz();
+      };
+    }
+    /* --- Mood board: populate stickers, support click-to-add and drag/drop --- */
+    function populateStickers() {
+      const container = document.getElementById('moodStickers');
+      if (!container) return;
+      container.innerHTML = '';
+      const urls = [
+        'https://i.imgur.com/oK3x5BH.jpeg',
+        'https://i.imgur.com/kUJiuhm.jpeg',
+        'https://i.imgur.com/PPq9KND.jpeg',
+        'https://i.imgur.com/OawRcMt.jpeg',
+        'https://i.imgur.com/n4b9m73.jpeg'
+      ];
+      urls.forEach(u => {
+        const s = document.createElement('div'); s.className = 'sticker';
+        s.innerHTML = `<img src="${u}" loading="lazy" draggable="false"/>`;
+        // click to clone onto board (better UX for touch)
+        s.addEventListener('click', () => {
+          addStickerToBoard(u, 40, 40);
+        });
+        // allow dragstart so desktop users can drag to board
+        s.draggable = true;
+        s.addEventListener('dragstart', (ev) => {
+          try { ev.dataTransfer.setData('text/plain', u); } catch (e) { }
+        });
+        container.appendChild(s);
+      });
+
+      const upload = document.getElementById('uploadImage');
+      upload && upload.addEventListener('change', (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        const url = URL.createObjectURL(f);
+        const s = document.createElement('div'); s.className = 'sticker';
+        s.innerHTML = `<img src="${url}" loading="lazy" draggable="false"/>`;
+        s.addEventListener('click', () => { addStickerToBoard(url, 40, 40); });
+        s.draggable = true;
+        s.addEventListener('dragstart', (ev) => { try { ev.dataTransfer.setData('text/plain', url); } catch (e) { } });
+        container.appendChild(s);
+      });
+
+      const board = document.getElementById('moodBoard');
+      if (!board) return;
+      board.addEventListener('dragover', (ev) => ev.preventDefault());
+      board.addEventListener('drop', (ev) => {
+        ev.preventDefault();
+        const url = ev.dataTransfer.getData('text/plain');
+        if (!url) return;
+        const rect = board.getBoundingClientRect();
+        const x = ev.clientX - rect.left - 48;
+        const y = ev.clientY - rect.top - 48;
+        addStickerToBoard(url, x, y);
+      });
+    }
+
+    // add sticker to board at given relative x,y
+    function addStickerToBoard(url, x, y) {
+      const board = document.getElementById('moodBoard');
+      if (!board) return;
+      const node = document.createElement('div'); node.className = 'sticker';
+      node.style.position = 'absolute';
+      // clamp positions
+      const br = board.getBoundingClientRect();
+      const w = 96, h = 96;
+      let nx = Math.max(0, Math.min(br.width - w, x));
+      let ny = Math.max(0, Math.min(br.height - h, y));
+      node.style.left = nx + 'px';
+      node.style.top = ny + 'px';
+      node.innerHTML = `<img src="${url}" loading="lazy" draggable="false"/>`;
+      makeDraggable(node);
+      board.appendChild(node);
+    }
+
+    function makeDraggable(node) {
+      let offsetX = 0, offsetY = 0, dragging = false;
+      node.addEventListener('pointerdown', (e) => {
+        dragging = true; node.setPointerCapture(e.pointerId);
+        offsetX = e.clientX - node.getBoundingClientRect().left; offsetY = e.clientY - node.getBoundingClientRect().top;
+        node.style.cursor = 'grabbing';
+      });
+      node.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const board = document.getElementById('moodBoard').getBoundingClientRect();
+        let x = e.clientX - board.left - offsetX; let y = e.clientY - board.top - offsetY;
+        x = Math.max(0, Math.min(board.width - node.offsetWidth, x)); y = Math.max(0, Math.min(board.height - node.offsetHeight, y));
+        node.style.left = x + 'px'; node.style.top = y + 'px';
+      });
+      node.addEventListener('pointerup', (e) => { dragging = false; try { node.releasePointerCapture(e.pointerId); } catch (e) { } node.style.cursor = 'grab'; });
+      // also allow double-tap to remove
+      node.addEventListener('dblclick', () => node.remove());
+    }
+
+    /* Tic-Tac-Toe (simple 2 player) */
+    function initTicTacToe() {
+      const startBtn = document.getElementById('startTicTac');
+      const ttt = document.getElementById('ticTacToe');
+      const board = document.getElementById('tttBoard');
+      const resetBtn = document.getElementById('resetTtt');
+      let cells = [], turn = 'X';
+      startBtn && startBtn.addEventListener('click', () => {
+        ttt.style.display = ttt.style.display === 'none' ? 'block' : 'none';
+        if (ttt.style.display === 'block') {
+          board.innerHTML = '';
+          cells = [];
+          for (let i = 0; i < 9; i++) {
+            const c = document.createElement('div'); c.style.width = '70px'; c.style.height = '70px'; c.style.display = 'flex';
+            c.style.alignItems = 'center'; c.style.justifyContent = 'center'; c.style.background = 'rgba(255,255,255,0.02)';
+            c.style.fontSize = '28px'; c.style.borderRadius = '8px'; c.style.cursor = 'pointer';
+            c.addEventListener('click', () => {
+              if (c.textContent) return;
+              c.textContent = turn; turn = turn === 'X' ? 'O' : 'X';
+              checkTtt();
+            });
+            board.appendChild(c); cells.push(c);
+          }
+        }
+      });
+      resetBtn && resetBtn.addEventListener('click', () => { board.innerHTML = ''; ttt.style.display = 'none'; });
+      function checkTtt() {
+        const combos = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+        for (const combo of combos) {
+          const [a, b, c] = combo;
+          if (cells[a].textContent && cells[a].textContent === cells[b].textContent && cells[a].textContent === cells[c].textContent) {
+            cells[a].style.background = cells[b].style.background = cells[c].style.background = 'linear-gradient(90deg,#ffd6d6,#fff0f0)';
+            addAchievement('Vencedor do Jogo da Velha');
+            return;
+          }
+        }
+      }
+    }
+
+    /* Share stub */
+    document.getElementById('shareBtn') && document.getElementById('shareBtn').addEventListener('click', () => {
+      try {
+        if (navigator.share) { navigator.share({ title: 'Surpresa', text: 'Olha o que preparei pra você!', url: location.href }); addAchievement('Compartilhou'); }
+        else { prompt('Copie o link para compartilhar:', location.href); }
+      } catch (e) { }
+    });
+
+    /* safety: ensure decoration is applied on load */
+    try { const saved = (function () { try { return localStorage.getItem('decoration') } catch (e) { return null } })(); if (saved) applyDecoration(saved); } catch (e) { }
+
+  </script>
+</body>
+
+</html>
