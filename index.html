@@ -1331,17 +1331,10 @@
         -ms-overflow-style: none;
       }
       
-      /* Ensure full viewport height usage */
+      /* Ensure proper display in standalone mode */
       body {
-        height: 100vh;
-        height: -webkit-fill-available;
-      }
-      
-      /* Prevent overscroll bounce effect */
-      body {
-        position: fixed;
-        overflow-y: auto;
-        width: 100%;
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
       }
     }
 
