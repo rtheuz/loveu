@@ -4,9 +4,10 @@
 <head>
   <meta charset="utf-8" />
   <title>💖 B & M 💖</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <meta name="description" content="Uma surpresa romântica com músicas, lembranças e mensagens." />
   <meta name="theme-color" content="#ff80ab" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   
   <!-- PWA Manifest -->
@@ -35,9 +36,11 @@
       padding: 0
     }
 
-    html,
-    body {
-      height: 100%
+    html {
+      height: 100%;
+      /* Native app feel - hide scrollbar on standalone mode */
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     body {
@@ -45,9 +48,15 @@
       color: #fff;
       background: var(--bg-light) center/cover no-repeat fixed;
       min-height: 100vh;
+      min-height: -webkit-fill-available;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       transition: background .6s, color .4s;
+      /* Prevent pull-to-refresh on mobile */
+      overscroll-behavior-y: contain;
+      /* Safe area support for notched devices */
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
     /* layout */
@@ -56,7 +65,11 @@
       align-items: flex-start;
       justify-content: center;
       padding: 20px;
-      gap: 20px
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      gap: 20px;
+      min-height: calc(100vh - 40px);
+      min-height: calc(-webkit-fill-available - 40px);
     }
 
     .container {
@@ -655,8 +668,8 @@
     #controlPanel {
       transition: transform .28s ease, opacity .28s ease;
       position: fixed;
-      top: 12px;
-      left: 12px;
+      top: max(12px, env(safe-area-inset-top, 12px));
+      left: max(12px, env(safe-area-inset-left, 12px));
       background: var(--control-bg);
       backdrop-filter: blur(6px);
       padding: 8px;
@@ -675,8 +688,8 @@
     /* floating handle (always available) */
     #panelToggleHandle {
       position: fixed;
-      top: 12px;
-      left: 12px;
+      top: max(12px, env(safe-area-inset-top, 12px));
+      left: max(12px, env(safe-area-inset-left, 12px));
       z-index: 10002;
       padding: 8px 10px;
       border-radius: 10px;
@@ -1305,6 +1318,40 @@
     body.not-authenticated #cursor {
       display: none !important;
     }
+
+    /* PWA Native App Styling */
+    @media (display-mode: standalone) {
+      /* Hide scrollbars in standalone mode for native feel */
+      ::-webkit-scrollbar {
+        display: none;
+      }
+      
+      html {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      
+      /* Ensure full viewport height usage */
+      body {
+        height: 100vh;
+        height: -webkit-fill-available;
+      }
+      
+      /* Prevent overscroll bounce effect */
+      body {
+        position: fixed;
+        overflow-y: auto;
+        width: 100%;
+      }
+    }
+
+    /* iOS PWA specific fixes */
+    @supports (-webkit-touch-callout: none) {
+      body {
+        /* Fix iOS height issue with notch */
+        min-height: -webkit-fill-available;
+      }
+    }
   </style>
 </head>
 
@@ -1606,7 +1653,8 @@
     // Check if user is already authenticated
     function checkAuth() {
       try {
-        return sessionStorage.getItem(STORAGE_KEYS.auth) === 'true';
+        // Check localStorage for persistent auth (stays even after closing browser)
+        return localStorage.getItem(STORAGE_KEYS.auth) === 'true';
       } catch (e) {
         return false;
       }
@@ -1616,9 +1664,10 @@
     function setAuth(isAuth) {
       try {
         if (isAuth) {
-          sessionStorage.setItem(STORAGE_KEYS.auth, 'true');
+          // Use localStorage instead of sessionStorage for persistent login
+          localStorage.setItem(STORAGE_KEYS.auth, 'true');
         } else {
-          sessionStorage.removeItem(STORAGE_KEYS.auth);
+          localStorage.removeItem(STORAGE_KEYS.auth);
         }
       } catch (e) {
         console.error('setAuth error', e);
