@@ -1,15 +1,17 @@
 // Service Worker for B & M PWA
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = `loveu-cache-${CACHE_VERSION}`;
 
 // Files to cache for offline functionality
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.svg',
-  '/icon-512.svg',
-  '/faveicon.svg'
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-192.svg',
+  './icon-512.svg',
+  './faveicon.svg'
 ];
 
 // Install event - cache static assets
