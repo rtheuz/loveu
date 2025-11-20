@@ -8,6 +8,15 @@
   <meta name="description" content="Uma surpresa romântica com músicas, lembranças e mensagens." />
   <meta name="theme-color" content="#ff80ab" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  
+  <!-- iOS/Safari PWA support -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="B&M" />
+  <link rel="apple-touch-icon" href="icon-192.svg" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Montserrat:wght@400;600&display=swap');
 
@@ -2389,9 +2398,17 @@
       // Check if Firebase is available
       const useFirebase = typeof firebase !== 'undefined' && firebase.firestore;
 
-      function renderMessageItem(docId, msg) {
+      function renderMessageItem(docId, msg, index) {
         const div = document.createElement('div');
         div.className = `envelope ${msg.read ? 'read' : ''}`;
+        
+        // Check if this envelope was already opened (persisted in localStorage)
+        const openedKey = useFirebase ? `OPENED_MSG_${docId}` : `OPENED_MSG_IDX_${index}`;
+        const wasOpened = localStorage.getItem(openedKey) === 'true';
+        if (wasOpened) {
+          div.classList.add('opened');
+        }
+        
         div.innerHTML = `
           <div class="envelope-inner">
             <div class="envelope-front">
@@ -2402,7 +2419,17 @@
         `;
 
         div.addEventListener('click', () => {
-          div.classList.toggle('opened');
+          // Once opened, stay opened
+          if (!div.classList.contains('opened')) {
+            div.classList.add('opened');
+            // Persist opened state
+            try {
+              localStorage.setItem(openedKey, 'true');
+            } catch (e) {
+              console.error('Failed to save opened state:', e);
+            }
+          }
+          
           if (!msg.read && useFirebase && docId) {
             // Update read status in Firebase
             const db = firebase.firestore();
@@ -2444,9 +2471,9 @@
               }).catch(err => console.error('Error adding default message:', err));
             });
           } else {
-            snapshot.forEach(doc => {
+            snapshot.forEach((doc, index) => {
               const data = doc.data();
-              const el = renderMessageItem(doc.id, data);
+              const el = renderMessageItem(doc.id, data, index);
               grid.appendChild(el);
             });
           }
@@ -2530,7 +2557,7 @@
         function renderMessages() {
           grid.innerHTML = '';
           messages.forEach((msg, index) => {
-            const el = renderMessageItem(null, msg);
+            const el = renderMessageItem(null, msg, index);
             
             // Add localStorage save on click
             el.addEventListener('click', () => {
@@ -3459,6 +3486,18 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="firebase-cloudinary-sync.js"></script>
+  
+  <!-- PWA Service Worker Registration -->
+  <script>
+    // Registrar service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registrado'))
+          .catch(err => console.error('SW erro:', err));
+      });
+    }
+  </script>
 </body>
 
 </html>
