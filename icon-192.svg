@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff80ab;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff4f8b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="48" fill="url(#bgGradient)"/>
+  <g transform="translate(96, 96)">
+    <path d="M0,-45 C-25,-70 -50,-70 -50,-45 C-50,-20 0,20 0,45 C0,20 50,-20 50,-45 C50,-70 25,-70 0,-45 Z" 
+          fill="white" 
+          opacity="0.95"/>
+    <text x="-32" y="10" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#ff4f8b">B&amp;M</text>
+  </g>
+</svg>
