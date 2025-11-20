@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff1493"/>
+      <stop offset="50%" stop-color="#ff69b4"/>
+      <stop offset="100%" stop-color="#ff80ab"/>
+    </linearGradient>
+    
+    <filter id="textShadow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Fundo com gradiente -->
+  <rect width="192" height="192" rx="42" fill="url(#bgGradient)"/>
+
+  <!-- Corações decorativos sutis -->
+  <path d="M165 35 C165 35 162 33 159 33 C157 33 155 34 155 36 C155 38 157 41 165 46 C173 41 175 38 175 36 C175 34 173 33 171 33 C168 33 165 35 165 35 Z"
+        fill="white" opacity="0.2"/>
+  
+  <path d="M30 155 C30 155 27 153 24 153 C22 153 20 154 20 156 C20 158 22 161 30 166 C38 161 40 158 40 156 C40 154 38 153 36 153 C33 153 30 155 30 155 Z"
+        fill="white" opacity="0.2"/>
+
+  <!-- Letra B -->
+  <text x="45" y="115" 
+        font-family="'Segoe UI', 'Arial', sans-serif" 
+        font-size="70" 
+        fill="white" 
+        font-weight="700"
+        letter-spacing="2"
+        filter="url(#textShadow)">B</text>
+
+  <!-- Ampersand & -->
+  <text x="96" y="110" 
+        font-family="'Georgia', serif" 
+        font-size="45" 
+        fill="white" 
+        text-anchor="middle"
+        font-weight="400"
+        filter="url(#textShadow)">&amp;</text>
+
+  <!-- Letra M -->
+  <text x="135" y="115" 
+        font-family="'Segoe UI', 'Arial', sans-serif" 
+        font-size="70" 
+        fill="white" 
+        font-weight="700"
+        letter-spacing="2"
+        filter="url(#textShadow)">M</text>
+
+  <!-- Coração central abaixo -->
+  <path d="M96 130 C96 130 90 125 83 125 C77 125 73 129 73 135 C73 142 80 150 96 165 C112 150 119 142 119 135 C119 129 115 125 109 125 C102 125 96 130 96 130 Z"
+        fill="white" opacity="0.95" filter="url(#textShadow)"/>
+
+  <!-- Brilhos sutis -->
+  <circle cx="60" cy="40" r="2" fill="white" opacity="0.7"/>
+  <circle cx="150" cy="170" r="2" fill="white" opacity="0.7"/>
+  <circle cx="35" cy="90" r="1.5" fill="white" opacity="0.6"/>
+</svg>
