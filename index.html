@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <title>B & M FOREVER</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,shrink-to-fit=no" />
   <meta name="description" content="Uma surpresa romântica com músicas, lembranças e mensagens." />
   <meta name="theme-color" content="#ff80ab" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -16,8 +16,12 @@
   <!-- iOS/Safari PWA support -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="B&M" />
+  <meta name="apple-mobile-web-app-title" content="B&M 💖" />
   <link rel="apple-touch-icon" href="https://i.imgur.com/XzL3LBy.png" />
+  
+  <!-- Preload para melhor performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Montserrat:wght@400;600&display=swap');
 
@@ -1474,6 +1478,49 @@
       body {
         min-height: 100vh;
         min-height: -webkit-fill-available;
+        /* Remover seleção de texto para parecer app nativo */
+        -webkit-user-select: none;
+        user-select: none;
+        /* Melhorar toque */
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      
+      /* Permitir seleção apenas em inputs e textareas */
+      input, textarea, [contenteditable] {
+        -webkit-user-select: text;
+        user-select: text;
+      }
+      
+      /* Remover highlight azul em iOS */
+      * {
+        -webkit-tap-highlight-color: transparent;
+      }
+    }
+    
+    /* Estilo de app nativo para todos os dispositivos móveis */
+    @media (max-width: 768px) {
+      /* Remover scrollbars em mobile */
+      ::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+      
+      html {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      
+      body {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      
+      /* Melhorar feedback de toque */
+      button, .btn, .card, .tab {
+        -webkit-tap-highlight-color: rgba(255, 128, 171, 0.3);
+        touch-action: manipulation;
       }
     }
 
@@ -1594,6 +1641,125 @@
     .btn, .card, .tab, #scrollToTop {
       will-change: transform;
     }
+    
+    /* Pull to Refresh Indicator */
+    #pullToRefresh {
+      position: fixed;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      transition: top 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 80, 130, 0.4);
+    }
+    
+    #pullToRefresh.show {
+      top: 20px;
+    }
+    
+    #pullToRefresh::after {
+      content: '↓';
+      font-size: 24px;
+      color: white;
+      animation: pullBounce 1s ease-in-out infinite;
+    }
+    
+    @keyframes pullBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(5px); }
+    }
+    
+    /* Loading Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s ease-in-out infinite;
+      border-radius: 8px;
+    }
+    
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Shake animation para feedback */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    .shake {
+      animation: shake 0.5s ease;
+    }
+    
+    /* Pulse animation */
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+    
+    .pulse {
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    /* Bounce animation */
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .bounce {
+      animation: bounce 1s ease-in-out infinite;
+    }
+    
+    /* Swipe indicator */
+    .swipe-hint {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      animation: fadeInOut 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+    
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+    
+    /* Touch feedback overlay */
+    .touch-feedback {
+      position: fixed;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 128, 171, 0.4) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%) scale(0);
+      animation: touchRipple 0.6s ease-out;
+    }
+    
+    @keyframes touchRipple {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 
@@ -1616,6 +1782,9 @@
     </div>
   </div>
 
+  <!-- Pull to Refresh Indicator -->
+  <div id="pullToRefresh"></div>
+  
   <!-- Floating toggle handle: always available even if control panel is collapsed or off-screen -->
   <button id="panelToggleHandle" title="Mostrar / Esconder painel">☰</button>
 
@@ -3966,6 +4135,313 @@
         el.style.transform = 'translateY(20px)';
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         observer.observe(el);
+      });
+    })();
+    
+    /* ========================================
+       FUNCIONALIDADES INTERATIVAS AVANÇADAS
+       ======================================== */
+    
+    // Feedback Háptico (Vibração)
+    function hapticFeedback(type = 'light') {
+      if ('vibrate' in navigator) {
+        const patterns = {
+          light: 10,
+          medium: 20,
+          heavy: 30,
+          success: [10, 50, 10],
+          error: [20, 50, 20, 50, 20]
+        };
+        navigator.vibrate(patterns[type] || patterns.light);
+      }
+    }
+    
+    // Touch Feedback Visual
+    function createTouchFeedback(x, y) {
+      const feedback = document.createElement('div');
+      feedback.className = 'touch-feedback';
+      feedback.style.left = x + 'px';
+      feedback.style.top = y + 'px';
+      document.body.appendChild(feedback);
+      setTimeout(() => feedback.remove(), 600);
+    }
+    
+    // Adicionar feedback háptico e visual em todos os botões
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('button, .btn, .card, .tab').forEach(el => {
+        el.addEventListener('touchstart', (e) => {
+          const touch = e.touches[0];
+          createTouchFeedback(touch.clientX, touch.clientY);
+          hapticFeedback('light');
+        }, { passive: true });
+        
+        el.addEventListener('click', () => {
+          hapticFeedback('light');
+        });
+      });
+    });
+    
+    // Pull to Refresh
+    (function() {
+      let pullToRefresh = document.getElementById('pullToRefresh');
+      if (!pullToRefresh) {
+        pullToRefresh = document.createElement('div');
+        pullToRefresh.id = 'pullToRefresh';
+        document.body.appendChild(pullToRefresh);
+      }
+      
+      let startY = 0;
+      let currentY = 0;
+      let pulling = false;
+      let pullDistance = 0;
+      
+      document.addEventListener('touchstart', (e) => {
+        if (window.scrollY === 0) {
+          startY = e.touches[0].clientY;
+          pulling = true;
+        }
+      }, { passive: true });
+      
+      document.addEventListener('touchmove', (e) => {
+        if (!pulling || window.scrollY > 0) {
+          pulling = false;
+          return;
+        }
+        
+        currentY = e.touches[0].clientY;
+        pullDistance = currentY - startY;
+        
+        if (pullDistance > 0 && pullDistance < 100) {
+          pullToRefresh.style.top = (pullDistance / 2 - 20) + 'px';
+          if (pullDistance > 60) {
+            pullToRefresh.classList.add('show');
+            hapticFeedback('medium');
+          } else {
+            pullToRefresh.classList.remove('show');
+          }
+        }
+      }, { passive: true });
+      
+      document.addEventListener('touchend', () => {
+        if (pulling && pullDistance > 60) {
+          hapticFeedback('success');
+          pullToRefresh.classList.remove('show');
+          pullToRefresh.style.top = '-60px';
+          
+          // Recarregar dados
+          setTimeout(() => {
+            if (typeof loadAllData === 'function') {
+              loadAllData();
+            }
+            showToast('Atualizado! 💖');
+          }, 300);
+        } else {
+          pullToRefresh.classList.remove('show');
+          pullToRefresh.style.top = '-60px';
+        }
+        pulling = false;
+        pullDistance = 0;
+      }, { passive: true });
+    })();
+    
+    // Swipe Gestures para navegação entre tabs
+    (function() {
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchEndX = 0;
+      let touchEndY = 0;
+      
+      const tabs = document.querySelectorAll('.tab');
+      let currentTabIndex = 0;
+      
+      function getCurrentTabIndex() {
+        const activeTab = document.querySelector('.tab.active');
+        return Array.from(tabs).indexOf(activeTab);
+      }
+      
+      function switchTab(direction) {
+        currentTabIndex = getCurrentTabIndex();
+        const newIndex = currentTabIndex + direction;
+        
+        if (newIndex >= 0 && newIndex < tabs.length) {
+          tabs[currentTabIndex].classList.remove('active');
+          tabs[newIndex].classList.add('active');
+          tabs[newIndex].click();
+          hapticFeedback('light');
+        }
+      }
+      
+      document.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+      }, { passive: true });
+      
+      document.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
+        
+        const diffX = touchStartX - touchEndX;
+        const diffY = touchStartY - touchEndY;
+        
+        // Swipe horizontal (esquerda/direita) para mudar tabs
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+          if (diffX > 0) {
+            // Swipe left - próxima tab
+            switchTab(1);
+          } else {
+            // Swipe right - tab anterior
+            switchTab(-1);
+          }
+        }
+      }, { passive: true });
+    })();
+    
+    // Long Press para ações rápidas
+    (function() {
+      let longPressTimer = null;
+      const longPressDuration = 500;
+      
+      document.querySelectorAll('.card, .photo img').forEach(el => {
+        el.addEventListener('touchstart', (e) => {
+          longPressTimer = setTimeout(() => {
+            hapticFeedback('medium');
+            el.classList.add('pulse');
+            createTouchFeedback(e.touches[0].clientX, e.touches[0].clientY);
+            
+            // Ação de long press (pode ser customizada)
+            if (el.classList.contains('card')) {
+              showToast('Segure para mais opções 💖');
+            }
+          }, longPressDuration);
+        }, { passive: true });
+        
+        el.addEventListener('touchend', () => {
+          if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+          }
+          el.classList.remove('pulse');
+        }, { passive: true });
+        
+        el.addEventListener('touchmove', () => {
+          if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+          }
+        }, { passive: true });
+      });
+    })();
+    
+    // Double Tap para zoom (em imagens)
+    (function() {
+      let lastTap = 0;
+      
+      document.querySelectorAll('.photo img, .card img').forEach(img => {
+        img.addEventListener('touchend', (e) => {
+          const currentTime = new Date().getTime();
+          const tapLength = currentTime - lastTap;
+          
+          if (tapLength < 300 && tapLength > 0) {
+            // Double tap
+            e.preventDefault();
+            hapticFeedback('medium');
+            
+            // Toggle zoom
+            if (img.style.transform === 'scale(1.5)') {
+              img.style.transform = 'scale(1)';
+              img.style.transition = 'transform 0.3s ease';
+            } else {
+              img.style.transform = 'scale(1.5)';
+              img.style.transition = 'transform 0.3s ease';
+            }
+            
+            setTimeout(() => {
+              img.style.transform = 'scale(1)';
+            }, 2000);
+          }
+          
+          lastTap = currentTime;
+        }, { passive: false });
+      });
+    })();
+    
+    // Loading States com Skeleton Screens
+    function showSkeleton(container) {
+      if (!container) return;
+      container.innerHTML = `
+        <div class="skeleton" style="height: 100px; margin-bottom: 10px;"></div>
+        <div class="skeleton" style="height: 100px; margin-bottom: 10px;"></div>
+        <div class="skeleton" style="height: 100px;"></div>
+      `;
+    }
+    
+    // Adicionar animação de shake em erros
+    function shakeElement(element) {
+      if (!element) return;
+      element.classList.add('shake');
+      hapticFeedback('error');
+      setTimeout(() => {
+        element.classList.remove('shake');
+      }, 500);
+    }
+    
+    // Melhorar feedback visual em ações
+    document.addEventListener('DOMContentLoaded', () => {
+      // Adicionar pulse em elementos importantes
+      const importantElements = document.querySelectorAll('.message, h1');
+      importantElements.forEach(el => {
+        el.classList.add('pulse');
+      });
+      
+      // Adicionar bounce em botões de ação principal
+      const primaryButtons = document.querySelectorAll('#playBtn, #loginBtn');
+      primaryButtons.forEach(btn => {
+        btn.classList.add('bounce');
+      });
+    });
+    
+    // Gestos de pinch para zoom (em imagens grandes)
+    (function() {
+      let initialDistance = 0;
+      let currentScale = 1;
+      
+      document.querySelectorAll('.photo img, #modalImg').forEach(img => {
+        img.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 2) {
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+            initialDistance = Math.hypot(
+              touch2.clientX - touch1.clientX,
+              touch2.clientY - touch1.clientY
+            );
+          }
+        }, { passive: true });
+        
+        img.addEventListener('touchmove', (e) => {
+          if (e.touches.length === 2) {
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+            const currentDistance = Math.hypot(
+              touch2.clientX - touch1.clientX,
+              touch2.clientY - touch1.clientY
+            );
+            
+            const scale = currentDistance / initialDistance;
+            currentScale = Math.max(1, Math.min(3, scale));
+            img.style.transform = `scale(${currentScale})`;
+            img.style.transition = 'none';
+          }
+        }, { passive: true });
+        
+        img.addEventListener('touchend', () => {
+          if (currentScale > 1) {
+            setTimeout(() => {
+              img.style.transform = 'scale(1)';
+              img.style.transition = 'transform 0.3s ease';
+              currentScale = 1;
+            }, 2000);
+          }
+        }, { passive: true });
       });
     })();
   </script>
