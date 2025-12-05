@@ -2,14 +2,17 @@
   "name": "B & M 💖",
   "short_name": "B&M",
   "description": "B&M LOVE APP - Um app romântico com músicas, lembranças e mensagens",
-  "start_url": "./",
+  "start_url": "./?utm_source=pwa",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen", "minimal-ui"],
   "background_color": "#0b0710",
   "theme_color": "#ff80ab",
   "orientation": "any",
   "prefer_related_applications": false,
   "categories": ["lifestyle", "entertainment"],
+  "dir": "ltr",
+  "lang": "pt-BR",
   "screenshots": [],
   "shortcuts": [
     {

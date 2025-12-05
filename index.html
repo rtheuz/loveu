@@ -8,16 +8,20 @@
   <meta name="description" content="Uma surpresa romântica com músicas, lembranças e mensagens." />
   <meta name="theme-color" content="#ff80ab" />
   <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="B&M 💖" />
   <link rel="icon" type="image/png" href="https://i.imgur.com/DFVw1zK.png" />
   
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json" />
   
-  <!-- iOS/Safari PWA support -->
+  <!-- iOS/Safari PWA support - Forçar modo standalone -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="B&M 💖" />
+  <meta name="apple-touch-fullscreen" content="yes" />
   <link rel="apple-touch-icon" href="https://i.imgur.com/XzL3LBy.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="https://i.imgur.com/hTlnLpz.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="https://i.imgur.com/hTlnLpz.png" />
   
   <!-- Preload para melhor performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1472,18 +1476,26 @@
       html {
         scrollbar-width: none;
         -ms-overflow-style: none;
+        /* Forçar altura completa */
+        height: 100%;
+        overflow: hidden;
       }
       
-      /* Ensure proper display in standalone mode */
       body {
         min-height: 100vh;
         min-height: -webkit-fill-available;
+        height: 100vh;
+        height: -webkit-fill-available;
+        overflow: auto;
         /* Remover seleção de texto para parecer app nativo */
         -webkit-user-select: none;
         user-select: none;
         /* Melhorar toque */
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
+        /* Esconder barras do navegador */
+        position: fixed;
+        width: 100%;
       }
       
       /* Permitir seleção apenas em inputs e textareas */
@@ -1496,6 +1508,22 @@
       * {
         -webkit-tap-highlight-color: transparent;
       }
+    }
+    
+    /* Classe standalone-mode para forçar estilo mesmo sem media query */
+    .standalone-mode {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    .standalone-mode body {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
     }
     
     /* Estilo de app nativo para todos os dispositivos móveis */
@@ -4026,14 +4054,60 @@
   
   <!-- PWA Service Worker Registration -->
   <script>
-    // Registrar service worker
+    // Registrar service worker e forçar modo standalone
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('SW registrado:', reg.scope))
+          .then(reg => {
+            console.log('SW registrado:', reg.scope);
+            // Forçar atualização do service worker
+            reg.update();
+          })
           .catch(err => console.error('SW erro:', err));
       });
     }
+    
+    // Detectar e forçar modo standalone
+    (function() {
+      // Verificar se está em modo standalone
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                          window.navigator.standalone ||
+                          document.referrer.includes('android-app://');
+      
+      if (isStandalone) {
+        document.documentElement.classList.add('standalone-mode');
+        document.body.classList.add('standalone-mode');
+        console.log('Modo standalone ativado');
+      }
+      
+      // Forçar remoção de barras do navegador
+      // Esconder barras de endereço em mobile quando possível
+      (function hideAddressBar() {
+        if (window.innerHeight < window.outerHeight) {
+          setTimeout(() => {
+            window.scrollTo(0, 1);
+          }, 0);
+        }
+      })();
+      
+      // Re-esconder barras quando a orientação mudar
+      window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+          window.scrollTo(0, 1);
+        }, 500);
+      });
+      
+      // Prevenir scroll que revela barras
+      let lastScrollTop = 0;
+      window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+        if (currentScroll < lastScrollTop && currentScroll === 0) {
+          // Se voltou ao topo, esconder barras
+          setTimeout(() => window.scrollTo(0, 1), 100);
+        }
+        lastScrollTop = currentScroll;
+      }, { passive: true });
+    })();
   </script>
   
   <!-- Botão de voltar ao topo -->
